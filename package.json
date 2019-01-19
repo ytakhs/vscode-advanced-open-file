@@ -5,20 +5,20 @@
     "version": "0.0.1",
     "publisher": "jit-y",
     "engines": {
-        "vscode": "^1.18.0"
+        "vscode": "^1.30.0"
     },
     "categories": [
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.sayHello"
+        "onCommand:extension.advancedOpenFile"
     ],
     "main": "./out/extension",
     "contributes": {
         "commands": [
             {
-                "command": "extension.sayHello",
-                "title": "Hello World"
+                "command": "extension.advancedOpenFile",
+                "title": "Advanced Open File"
             }
         ]
     },
@@ -30,9 +30,13 @@
         "test": "npm run compile && node ./node_modules/vscode/bin/test"
     },
     "devDependencies": {
-        "typescript": "^2.6.1",
-        "vscode": "^1.1.6",
+        "@types/glob": "^7.1.1",
+        "@types/mocha": "^2.2.42",
         "@types/node": "^7.0.43",
-        "@types/mocha": "^2.2.42"
+        "typescript": "^2.6.1",
+        "vscode": "^1.1.26"
+    },
+    "dependencies": {
+        "glob": "^7.1.3"
     }
 }
