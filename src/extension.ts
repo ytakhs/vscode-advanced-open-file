@@ -6,9 +6,45 @@ import {
   window,
   workspace,
   ExtensionContext,
+  FileType,
+  QuickPickItem,
+  QuickPick,
 } from "vscode";
 
 import { sync as globSync } from "glob"
+import * as path from "path"
+import * as fs from "fs"
+
+const detectFileType = (stat: fs.Stats): FileType => {
+    if (stat.isFile()) {
+        return FileType.File
+    } else if (stat.isDirectory()) {
+        return FileType.Directory
+    } else if (stat.isSymbolicLink()) {
+        return FileType.SymbolicLink
+    } else {
+        return FileType.Unknown
+    }
+}
+
+const createFilePicker = () => {
+    const root = workspace.workspaceFolders[0]
+    const pickFileItems = globSync("**", { ignore: "**/node_modules/**" }).map(f => {
+        const filetype = detectFileType(fs.statSync(f))
+        const filepath = path.join(root.uri.toString(), f)
+
+        return {
+            label: filepath,
+            filetype: filetype,
+        }
+    })
+
+    const quickpick = window.createQuickPick()
+    quickpick.items = pickFileItems
+    quickpick.placeholder = "select file"
+
+    return quickpick
+}
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -23,17 +59,20 @@ export function activate(context: ExtensionContext) {
     // The commandId parameter must match the command field in package.json
     let disposable = commands.registerCommand('extension.advancedOpenFile', async () => {
         // The code you place here will be executed every time your command is executed
-        let files = await workspace.findFiles("**", "**/node_modules/**", 10)
-        // let folders = [...workspace.workspaceFolders].map(f => { return f.name })
-        // let filenames: string[] = [...files].map(file => { return file.toString() })
-        let fs = globSync("**", { ignore: "**/node_modules/**" }).map(path => {
-            return path
+        const quickpick = createFilePicker()
+
+        quickpick.show()
+
+        const picked = await new Promise<QuickPickItem | undefined>((resolve) => {
+            quickpick.onDidAccept(() => resolve(quickpick.activeItems[0]))
         })
-        // const quickPick = window.createQuickPick()
-        // quickPick.items = filenames
-        // const items = [...folders, ...filenames]
-        const picked = await window.showQuickPick(fs)
-        window.showInformationMessage(picked)
+        quickpick.hide()
+
+        if (!picked) {
+            throw "failed"
+        }
+
+        window.showInformationMessage(picked.label)
     });
 
     context.subscriptions.push(disposable);
