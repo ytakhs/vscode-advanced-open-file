@@ -2,13 +2,24 @@
 import {
   window,
   FileType,
+  QuickPick,
   QuickPickItem,
 } from "vscode"
 
 import { sync as globSync } from "glob"
 import * as fs from "fs"
 
-const detectFileType = (stat: fs.Stats): FileType => {
+class FilePickItem implements QuickPickItem {
+    label: string
+    filetype: FileType
+
+    constructor(path: string, filetype: FileType) {
+        this.label = path;
+        this.filetype = filetype
+    }
+}
+
+function detectFileType(stat: fs.Stats): FileType {
   if (stat.isFile()) {
       return FileType.File
   } else if (stat.isDirectory()) {
@@ -20,46 +31,68 @@ const detectFileType = (stat: fs.Stats): FileType => {
   }
 }
 
-interface FilePickItem extends QuickPickItem {
-    filetype: FileType
+function createFilePickItems(): ReadonlyArray<QuickPickItem> {
+    return globSync("**", { ignore: "**/node_modules/**" }).map(f => {
+        const filetype = detectFileType(fs.statSync(f))
+
+        return new FilePickItem(f, filetype)
+    })
 }
 
-const createFilePicker = () => {
-  // const root = workspace.workspaceFolders[0]
-  const pickFileItems = globSync("**", { ignore: "**/node_modules/**" }).map(f => {
-      const filetype = detectFileType(fs.statSync(f))
-      // const filepath = path.join(root.uri.toString(), f)
-
-      return {
-          label: f,
-          filetype: filetype,
-      } as FilePickItem
-  })
-
+function createFilePicker(items: ReadonlyArray<QuickPickItem>) {
   const quickpick = window.createQuickPick()
-  quickpick.items = pickFileItems
+  quickpick.items = items
   quickpick.placeholder = "select file"
 
   return quickpick
 }
 
-export const advancedOpenFile = async () => {
-  // The code you place here will be executed every time your command is executed
-  const quickpick = createFilePicker()
+async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | string | undefined> {
+    let quickpick: QuickPick<QuickPickItem>
 
-  quickpick.show()
+    quickpick = qp
 
-  const picked = await new Promise<QuickPickItem | undefined>((resolve) => {
-      quickpick.onDidAccept(() => resolve(quickpick.activeItems[0]))
-  })
-  quickpick.hide()
+    quickpick.show()
 
-  if (!picked) {
+    const pickedItem = await new Promise<QuickPickItem | undefined>((resolve) => {
+        quickpick.onDidAccept(() => {
+            const picked =  quickpick.activeItems[0]
+
+            resolve(picked)
+        })
+    })
+    quickpick.hide()
+
+    if (typeof pickedItem === "string") {
+        return pickedItem
+    } else if ("label" in pickedItem) {
+        const filePickItem = pickedItem as FilePickItem
+        if (filePickItem.filetype === FileType.Directory) {
+            const initialValue = pickedItem.label
+            const items = quickpick.items
+            quickpick.dispose()
+
+            quickpick = createFilePicker(items)
+            quickpick.value = initialValue
+            return pickFile(quickpick)
+        } else {
+            return pickedItem
+        }
+    }
+
+}
+
+export async function advancedOpenFile() {
+  const filePickItems = createFilePickItems()
+  const quickpick = createFilePicker(filePickItems)
+
+  const pickedItem = await pickFile(quickpick)
+
+  if (!pickedItem) {
       throw "failed"
   }
 
-  const filePickItem = picked as FilePickItem
-  console.log(filePickItem.filetype)
+  const filePickItem = pickedItem as FilePickItem
 
-  window.showInformationMessage(picked.label)
+  window.showInformationMessage(filePickItem.label)
 }
