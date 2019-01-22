@@ -54,13 +54,16 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
 
     quickpick.show()
 
-    const pickedItem = await new Promise<QuickPickItem | undefined>((resolve) => {
+    const pickedItem = await new Promise<QuickPickItem | string | undefined>((resolve) => {
         quickpick.onDidAccept(() => {
-            const picked =  quickpick.activeItems[0]
-
-            resolve(picked)
+            if (quickpick.selectedItems[0]) {
+                resolve(quickpick.selectedItems[0])
+            } else {
+                resolve(quickpick.value)
+            }
         })
     })
+
     quickpick.hide()
 
     if (typeof pickedItem === "string") {
@@ -83,16 +86,20 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
 }
 
 export async function advancedOpenFile() {
-  const filePickItems = createFilePickItems()
-  const quickpick = createFilePicker(filePickItems)
+    const filePickItems = createFilePickItems()
+    const quickpick = createFilePicker(filePickItems)
 
-  const pickedItem = await pickFile(quickpick)
+    const pickedItem = await pickFile(quickpick)
 
-  if (!pickedItem) {
-      throw "failed"
-  }
+    if (!pickedItem) {
+        throw "failed"
+    }
 
-  const filePickItem = pickedItem as FilePickItem
+    if (typeof pickedItem === "string") {
 
-  window.showInformationMessage(filePickItem.label)
+    } else if (pickedItem instanceof FilePickItem) {
+        console.log(pickedItem)
+    }
+
+    window.showInformationMessage("done")
 }
