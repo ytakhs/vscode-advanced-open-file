@@ -4,7 +4,11 @@ import {
   FileType,
   QuickPick,
   QuickPickItem,
+  Uri,
+  workspace,
 } from "vscode"
+
+import * as path from "path"
 
 import { sync as globSync } from "glob"
 import * as fs from "fs"
@@ -68,9 +72,8 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
 
     if (typeof pickedItem === "string") {
         return pickedItem
-    } else if ("label" in pickedItem) {
-        const filePickItem = pickedItem as FilePickItem
-        if (filePickItem.filetype === FileType.Directory) {
+    } else if (pickedItem instanceof FilePickItem) {
+        if (pickedItem.filetype === FileType.Directory) {
             const initialValue = pickedItem.label
             const items = quickpick.items
             quickpick.dispose()
@@ -95,8 +98,22 @@ export async function advancedOpenFile() {
         throw "failed"
     }
 
-    if (typeof pickedItem === "string") {
+    const root = workspace.workspaceFolders[0]
 
+    if (typeof pickedItem === "string") {
+        const fileUri = path.join(root.uri.toString(), pickedItem)
+        console.log(fileUri)
+        fs.appendFile(fileUri, "", (err) => { throw err } )
+
+        const document = await workspace.openTextDocument(fileUri)
+        if (!document) {
+            throw "invalid"
+        }
+
+        const editor = await window.showTextDocument(document)
+        if (!editor) {
+            throw "invalid"
+        }
     } else if (pickedItem instanceof FilePickItem) {
         console.log(pickedItem)
     }
