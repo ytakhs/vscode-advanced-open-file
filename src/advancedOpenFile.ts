@@ -13,12 +13,20 @@ import * as glob from "glob"
 import * as fs from "fs"
 
 class FilePickItem implements QuickPickItem {
+    filepath: string
+    rootPath: string
     label: string
     filetype: FileType
 
-    constructor(path: string, filetype: FileType) {
-        this.label = path;
+    constructor(filepath: string, rootPath: string, filetype: FileType) {
+        this.filepath = filepath;
+        this.rootPath = rootPath
+        this.label = this.getRelative(filepath);
         this.filetype = filetype
+    }
+
+    private getRelative(path: string): string {
+        return path.replace(this.rootPath, "")
     }
 }
 
@@ -45,16 +53,15 @@ function filesToExclude(projectRootPath: string): ReadonlyArray<string> {
 
 function createFilePickItems(root: Uri, ignoreFiles: ReadonlyArray<string>): Promise<ReadonlyArray<QuickPickItem>> {
     return new Promise((resolve) => {
-        console.log(ignoreFiles)
         glob(`${root.path}/**`, { ignore: ignoreFiles }, (err, matches) => {
             if (err) {
                 throw err
             }
 
-            const files = matches.map(f => {
+            const files = matches.filter(f => f != root.path).map(f => {
                 const filetype = detectFileType(fs.statSync(f))
 
-                return new FilePickItem(f, filetype)
+                return new FilePickItem(f, root.path, filetype)
             })
 
             resolve(files)
@@ -142,7 +149,7 @@ export async function advancedOpenFile() {
 
     const ignoreFiles = filesToExclude(targetWorkspaceFolder.uri.path)
     const filePickItems = await createFilePickItems(targetWorkspaceFolder.uri, ignoreFiles)
-    const quickpick = createFilePicker(targetWorkspaceFolder.uri.path, filePickItems)
+    const quickpick = createFilePicker("", filePickItems)
 
     const pickedItem = await pickFile(quickpick)
 
@@ -167,7 +174,7 @@ export async function advancedOpenFile() {
 
     } else if (pickedItem instanceof FilePickItem) {
         try {
-            await openFile(pickedItem.label)
+            await openFile(pickedItem.filepath)
         } catch(err) {
             window.showWarningMessage(err)
         }
