@@ -9,8 +9,6 @@ import {
   WorkspaceFolder,
 } from "vscode"
 
-import * as path from "path"
-
 import * as glob from "glob"
 import * as fs from "fs"
 
@@ -99,6 +97,28 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
 
 }
 
+async function createFile(path: string): Promise<void> {
+    return new Promise((resolve, reject) => {
+        fs.appendFile(path, "", (err) => {
+            if (err) { reject(err) }
+        })
+
+        resolve()
+    })
+}
+
+async function openFile(path: string): Promise<void> {
+    const document = await workspace.openTextDocument(path)
+    if (!document) {
+        throw "no such file exists"
+    }
+
+    const editor = await window.showTextDocument(document)
+    if (!editor) {
+        throw "showing document failed."
+    }
+}
+
 export async function advancedOpenFile() {
     const currentEditor = window.activeTextEditor
     let targetWorkspaceFolder: WorkspaceFolder
@@ -118,25 +138,26 @@ export async function advancedOpenFile() {
         throw "failed"
     }
 
-    const root = workspace.workspaceFolders[0]
-
     if (typeof pickedItem === "string") {
-        const fileUri = path.join(root.uri.toString(), pickedItem)
-        console.log(fileUri)
-        fs.appendFile(fileUri, "", (err) => { throw err } )
-
-        const document = await workspace.openTextDocument(fileUri)
-        if (!document) {
-            throw "invalid"
+        const newFilePath = pickedItem
+        try {
+            await createFile(newFilePath)
+        } catch(err) {
+            window.showWarningMessage(`${err}: ${newFilePath} already exists.`)
         }
 
-        const editor = await window.showTextDocument(document)
-        if (!editor) {
-            throw "invalid"
+        try {
+            await openFile(newFilePath)
+        } catch(err) {
+            window.showWarningMessage(err)
         }
+
+
     } else if (pickedItem instanceof FilePickItem) {
-        console.log(pickedItem)
+        try {
+            await openFile(pickedItem.label)
+        } catch(err) {
+            window.showWarningMessage(err)
+        }
     }
-
-    window.showInformationMessage("done")
 }
