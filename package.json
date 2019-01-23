@@ -24,7 +24,27 @@
                 "command": "extension.advancedOpenFile",
                 "title": "Advanced Open File"
             }
-        ]
+        ],
+        "keybindings": [
+            {
+              "command": "extension.advancedOpenFile",
+              "key": "ctrl+x ctrl+f"
+            }
+        ],
+        "configuration":{
+            "title": "VscodeAdvancedOpenFile Configuration",
+            "properties": {
+                "advancedOpenFile.excludeFiles": {
+                    "type": [
+                        "object",
+                        "null"
+                    ],
+                    "default": {
+                        "/node_modules/": true
+                    }
+                }
+            }
+        }
     },
     "scripts": {
         "vscode:prepublish": "npm run compile",

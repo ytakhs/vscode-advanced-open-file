@@ -34,9 +34,19 @@ function detectFileType(stat: fs.Stats): FileType {
   }
 }
 
-function createFilePickItems(root: Uri): Promise<ReadonlyArray<QuickPickItem>> {
+function filesToExclude(projectRootPath: string): ReadonlyArray<string> {
+    const excludesFromConfiguration = Object.assign(
+        workspace.getConfiguration("files", Uri.file(projectRootPath)).get("exclude"),
+        workspace.getConfiguration("advancedOpenFile").get("excludeFiles")
+    )
+
+    return Object.keys(excludesFromConfiguration)
+}
+
+function createFilePickItems(root: Uri, ignoreFiles: ReadonlyArray<string>): Promise<ReadonlyArray<QuickPickItem>> {
     return new Promise((resolve) => {
-        glob(`${root.path}/**`, {}, (err, matches) => {
+        console.log(ignoreFiles)
+        glob(`${root.path}/**`, { ignore: ignoreFiles }, (err, matches) => {
             if (err) {
                 throw err
             }
@@ -52,8 +62,9 @@ function createFilePickItems(root: Uri): Promise<ReadonlyArray<QuickPickItem>> {
     })
 }
 
-function createFilePicker(items: ReadonlyArray<QuickPickItem>) {
+function createFilePicker(initialValue: string, items: ReadonlyArray<QuickPickItem>) {
   const quickpick = window.createQuickPick()
+  quickpick.value = initialValue
   quickpick.items = items
   quickpick.placeholder = "select file"
 
@@ -87,7 +98,7 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
             const items = quickpick.items
             quickpick.dispose()
 
-            quickpick = createFilePicker(items)
+            quickpick = createFilePicker(initialValue, items)
             quickpick.value = initialValue
             return pickFile(quickpick)
         } else {
@@ -129,8 +140,9 @@ export async function advancedOpenFile() {
         targetWorkspaceFolder = workspace.getWorkspaceFolder(currentEditor.document.uri)
     }
 
-    const filePickItems = await createFilePickItems(targetWorkspaceFolder.uri)
-    const quickpick = createFilePicker(filePickItems)
+    const ignoreFiles = filesToExclude(targetWorkspaceFolder.uri.path)
+    const filePickItems = await createFilePickItems(targetWorkspaceFolder.uri, ignoreFiles)
+    const quickpick = createFilePicker(targetWorkspaceFolder.uri.path, filePickItems)
 
     const pickedItem = await pickFile(quickpick)
 
