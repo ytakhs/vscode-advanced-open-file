@@ -4,6 +4,10 @@
     "description": "",
     "version": "0.0.1",
     "publisher": "jit-y",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/jit-y/vscode-advanced-open-file"
+    },
     "engines": {
         "vscode": "^1.30.0"
     },
