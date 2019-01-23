@@ -34,7 +34,7 @@ function detectFileType(stat: fs.Stats): FileType {
   }
 }
 
-async function createFilePickItems(root: Uri): Promise<ReadonlyArray<QuickPickItem>> {
+function createFilePickItems(root: Uri): Promise<ReadonlyArray<QuickPickItem>> {
     return new Promise((resolve) => {
         glob(`${root.path}/**`, {}, (err, matches) => {
             if (err) {
@@ -97,7 +97,7 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
 
 }
 
-async function createFile(path: string): Promise<void> {
+function createFile(path: string): Promise<void> {
     return new Promise((resolve, reject) => {
         fs.appendFile(path, "", (err) => {
             if (err) { reject(err) }
