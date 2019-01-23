@@ -6,11 +6,12 @@ import {
   QuickPickItem,
   Uri,
   workspace,
+  WorkspaceFolder,
 } from "vscode"
 
 import * as path from "path"
 
-import { sync as globSync } from "glob"
+import * as glob from "glob"
 import * as fs from "fs"
 
 class FilePickItem implements QuickPickItem {
@@ -35,11 +36,21 @@ function detectFileType(stat: fs.Stats): FileType {
   }
 }
 
-function createFilePickItems(): ReadonlyArray<QuickPickItem> {
-    return globSync("**", { ignore: "**/node_modules/**" }).map(f => {
-        const filetype = detectFileType(fs.statSync(f))
+async function createFilePickItems(root: Uri): Promise<ReadonlyArray<QuickPickItem>> {
+    return new Promise((resolve) => {
+        glob(`${root.path}/**`, {}, (err, matches) => {
+            if (err) {
+                throw err
+            }
 
-        return new FilePickItem(f, filetype)
+            const files = matches.map(f => {
+                const filetype = detectFileType(fs.statSync(f))
+
+                return new FilePickItem(f, filetype)
+            })
+
+            resolve(files)
+        })
     })
 }
 
@@ -89,7 +100,16 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
 }
 
 export async function advancedOpenFile() {
-    const filePickItems = createFilePickItems()
+    const currentEditor = window.activeTextEditor
+    let targetWorkspaceFolder: WorkspaceFolder
+
+    if (!currentEditor) {
+        targetWorkspaceFolder = await window.showWorkspaceFolderPick()
+    } else {
+        targetWorkspaceFolder = workspace.getWorkspaceFolder(currentEditor.document.uri)
+    }
+
+    const filePickItems = await createFilePickItems(targetWorkspaceFolder.uri)
     const quickpick = createFilePicker(filePickItems)
 
     const pickedItem = await pickFile(quickpick)
