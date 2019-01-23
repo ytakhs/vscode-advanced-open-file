@@ -44,8 +44,8 @@ function detectFileType(stat: fs.Stats): FileType {
 
 function filesToExclude(projectRootPath: string): ReadonlyArray<string> {
     const excludesFromConfiguration = Object.assign(
-        workspace.getConfiguration("files", Uri.file(projectRootPath)).get("exclude"),
-        workspace.getConfiguration("advancedOpenFile").get("excludeFiles")
+        workspace.getConfiguration("advancedOpenFile").get("excludeFiles"),
+        workspace.getConfiguration("files", Uri.file(projectRootPath)).get("exclude")
     )
 
     return Object.keys(excludesFromConfiguration)
