@@ -9,24 +9,23 @@ import {
   WorkspaceFolder,
 } from "vscode"
 
-import * as glob from "glob"
+import * as path from "path"
 import * as fs from "fs"
 
 class FilePickItem implements QuickPickItem {
-    filepath: string
-    rootPath: string
+    relativePath: string
+    absolutePath: string
     label: string
+    detail: string
+    description: string
     filetype: FileType
 
-    constructor(filepath: string, rootPath: string, filetype: FileType) {
-        this.filepath = filepath;
-        this.rootPath = rootPath
-        this.label = this.getRelative(filepath);
+    constructor(relativePath: string, absolutePath: string, filetype: FileType) {
+        this.relativePath = relativePath
+        this.absolutePath = absolutePath
+        this.label = this.relativePath
+        this.detail = this.absolutePath
         this.filetype = filetype
-    }
-
-    private getRelative(path: string): string {
-        return path.replace(this.rootPath, "")
     }
 }
 
@@ -51,25 +50,22 @@ function filesToExclude(projectRootPath: string): ReadonlyArray<string> {
     return Object.keys(excludesFromConfiguration)
 }
 
-function createFilePickItems(root: Uri, ignoreFiles: ReadonlyArray<string>): Promise<ReadonlyArray<QuickPickItem>> {
+function createFilePickItems(rootpath: string, ignoreFiles: ReadonlyArray<string>): Promise<ReadonlyArray<QuickPickItem>> {
     return new Promise((resolve) => {
-        glob(`${root.path}/**`, { ignore: ignoreFiles }, (err, matches) => {
-            if (err) {
-                throw err
-            }
+        fs.readdir(rootpath, { encoding: "utf-8" }, (err, files) => {
+            const filePickItems = files.map(f => {
+                const absolutePath = path.join(rootpath, f)
+                const filetype = detectFileType(fs.statSync(absolutePath))
 
-            const files = matches.filter(f => f != root.path).map(f => {
-                const filetype = detectFileType(fs.statSync(f))
-
-                return new FilePickItem(f, root.path, filetype)
+                return new FilePickItem(f, absolutePath, filetype)
             })
 
-            resolve(files)
+            resolve(filePickItems)
         })
     })
 }
 
-function createFilePicker(initialValue: string, items: ReadonlyArray<QuickPickItem>) {
+function createFilePicker(rootpath: string, initialValue: string, items: ReadonlyArray<QuickPickItem>) {
   const quickpick = window.createQuickPick()
   quickpick.value = initialValue
   quickpick.items = items
@@ -78,7 +74,7 @@ function createFilePicker(initialValue: string, items: ReadonlyArray<QuickPickIt
   return quickpick
 }
 
-async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | string | undefined> {
+async function pickFile(rootpath: string, qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | string | undefined> {
     let quickpick: QuickPick<QuickPickItem>
 
     quickpick = qp
@@ -102,12 +98,13 @@ async function pickFile(qp: QuickPick<QuickPickItem>): Promise<QuickPickItem | s
     } else if (pickedItem instanceof FilePickItem) {
         if (pickedItem.filetype === FileType.Directory) {
             const initialValue = pickedItem.label
-            const items = quickpick.items
+            const items = await createFilePickItems(pickedItem.absolutePath, [])
             quickpick.dispose()
 
-            quickpick = createFilePicker(initialValue, items)
+            quickpick = createFilePicker(rootpath, initialValue, items)
+            quickpick.items = items
             quickpick.value = initialValue
-            return pickFile(quickpick)
+            return pickFile(rootpath, quickpick)
         } else {
             return pickedItem
         }
@@ -147,11 +144,12 @@ export async function advancedOpenFile() {
         targetWorkspaceFolder = workspace.getWorkspaceFolder(currentEditor.document.uri)
     }
 
-    const ignoreFiles = filesToExclude(targetWorkspaceFolder.uri.path)
-    const filePickItems = await createFilePickItems(targetWorkspaceFolder.uri, ignoreFiles)
-    const quickpick = createFilePicker("", filePickItems)
+    const rootpath = targetWorkspaceFolder.uri.path
+    const ignoreFiles = filesToExclude(rootpath)
+    const filePickItems = await createFilePickItems(rootpath, ignoreFiles)
+    const quickpick = createFilePicker(rootpath, "", filePickItems)
 
-    const pickedItem = await pickFile(quickpick)
+    const pickedItem = await pickFile(rootpath, quickpick)
 
     if (!pickedItem) {
         throw "failed"
@@ -174,7 +172,7 @@ export async function advancedOpenFile() {
 
     } else if (pickedItem instanceof FilePickItem) {
         try {
-            await openFile(pickedItem.filepath)
+            await openFile(pickedItem.absolutePath)
         } catch(err) {
             window.showWarningMessage(err)
         }
