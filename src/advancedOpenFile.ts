@@ -41,15 +41,6 @@ function detectFileType(stat: fs.Stats): FileType {
   }
 }
 
-function filesToExclude(projectRootPath: string): ReadonlyArray<string> {
-    const excludesFromConfiguration = Object.assign(
-        workspace.getConfiguration("advancedOpenFile").get("excludeFiles"),
-        workspace.getConfiguration("files", Uri.file(projectRootPath)).get("exclude")
-    )
-
-    return Object.keys(excludesFromConfiguration)
-}
-
 function createFilePickItems(rootpath: string, dir: string): Promise<ReadonlyArray<QuickPickItem>> {
     return new Promise((resolve) => {
         const currentpath = path.join(rootpath, dir)
@@ -66,9 +57,9 @@ function createFilePickItems(rootpath: string, dir: string): Promise<ReadonlyArr
     })
 }
 
-function createFilePicker(rootpath: string, initialValue: string, items: ReadonlyArray<QuickPickItem>) {
+function createFilePicker(value: string, items: ReadonlyArray<QuickPickItem>) {
   const quickpick = window.createQuickPick()
-  quickpick.value = initialValue
+  quickpick.value = value
   quickpick.items = items
   quickpick.placeholder = "select file"
 
@@ -107,7 +98,7 @@ async function pickFile(rootpath: string, qp: QuickPick<QuickPickItem>): Promise
             const items = await createFilePickItems(rootpath, pickedItem.relativePath)
             quickpick.dispose()
 
-            quickpick = createFilePicker(rootpath, pickedItem.label, items)
+            quickpick = createFilePicker(pickedItem.label, items)
             return pickFile(rootpath, quickpick)
         } else {
             return pickedItem
@@ -150,7 +141,7 @@ export async function advancedOpenFile() {
 
     const rootpath = targetWorkspaceFolder.uri.path
     const filePickItems = await createFilePickItems(rootpath, "")
-    const quickpick = createFilePicker(rootpath, "", filePickItems)
+    const quickpick = createFilePicker("", filePickItems)
 
     const pickedItem = await pickFile(rootpath, quickpick)
 
