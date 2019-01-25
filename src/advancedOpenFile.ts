@@ -24,7 +24,7 @@ class FilePickItem implements QuickPickItem {
         this.relativePath = relativePath
         this.absolutePath = absolutePath
         this.label = this.relativePath
-        this.detail = this.absolutePath
+        this.description = this.relativePath
         this.filetype = filetype
     }
 }
@@ -50,14 +50,15 @@ function filesToExclude(projectRootPath: string): ReadonlyArray<string> {
     return Object.keys(excludesFromConfiguration)
 }
 
-function createFilePickItems(rootpath: string, ignoreFiles: ReadonlyArray<string>): Promise<ReadonlyArray<QuickPickItem>> {
+function createFilePickItems(rootpath: string, dir: string): Promise<ReadonlyArray<QuickPickItem>> {
     return new Promise((resolve) => {
-        fs.readdir(rootpath, { encoding: "utf-8" }, (err, files) => {
+        const currentpath = path.join(rootpath, dir)
+        fs.readdir(currentpath, { encoding: "utf-8" }, (err, files) => {
             const filePickItems = files.map(f => {
-                const absolutePath = path.join(rootpath, f)
+                const absolutePath = path.join(currentpath, f)
                 const filetype = detectFileType(fs.statSync(absolutePath))
 
-                return new FilePickItem(f, absolutePath, filetype)
+                return new FilePickItem(path.join(dir, f), absolutePath, filetype)
             })
 
             resolve(filePickItems)
@@ -82,6 +83,12 @@ async function pickFile(rootpath: string, qp: QuickPick<QuickPickItem>): Promise
     quickpick.show()
 
     const pickedItem = await new Promise<QuickPickItem | string | undefined>((resolve) => {
+        quickpick.onDidChangeValue((value) => {
+            createFilePickItems(rootpath, value).then((items) => {
+                quickpick.items = items
+            })
+        })
+
         quickpick.onDidAccept(() => {
             if (quickpick.selectedItems[0]) {
                 resolve(quickpick.selectedItems[0])
@@ -97,13 +104,10 @@ async function pickFile(rootpath: string, qp: QuickPick<QuickPickItem>): Promise
         return pickedItem
     } else if (pickedItem instanceof FilePickItem) {
         if (pickedItem.filetype === FileType.Directory) {
-            const initialValue = pickedItem.label
-            const items = await createFilePickItems(pickedItem.absolutePath, [])
+            const items = await createFilePickItems(rootpath, pickedItem.relativePath)
             quickpick.dispose()
 
-            quickpick = createFilePicker(rootpath, initialValue, items)
-            quickpick.items = items
-            quickpick.value = initialValue
+            quickpick = createFilePicker(rootpath, pickedItem.label, items)
             return pickFile(rootpath, quickpick)
         } else {
             return pickedItem
@@ -145,8 +149,7 @@ export async function advancedOpenFile() {
     }
 
     const rootpath = targetWorkspaceFolder.uri.path
-    const ignoreFiles = filesToExclude(rootpath)
-    const filePickItems = await createFilePickItems(rootpath, ignoreFiles)
+    const filePickItems = await createFilePickItems(rootpath, "")
     const quickpick = createFilePicker(rootpath, "", filePickItems)
 
     const pickedItem = await pickFile(rootpath, quickpick)
@@ -158,7 +161,7 @@ export async function advancedOpenFile() {
     if (typeof pickedItem === "string") {
         const newFilePath = pickedItem
         try {
-            await createFile(newFilePath)
+            await createFile(path.join(rootpath, newFilePath))
         } catch(err) {
             window.showWarningMessage(`${err}: ${newFilePath} already exists.`)
         }
