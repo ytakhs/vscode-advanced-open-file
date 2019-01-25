@@ -159,9 +159,9 @@ export async function advancedOpenFile() {
     }
 
     if (typeof pickedItem === "string") {
-        const newFilePath = pickedItem
+        const newFilePath = path.join(rootpath, pickedItem)
         try {
-            await createFile(path.join(rootpath, newFilePath))
+            await createFile(newFilePath)
         } catch(err) {
             window.showWarningMessage(`${err}: ${newFilePath} already exists.`)
         }
