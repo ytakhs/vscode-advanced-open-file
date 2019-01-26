@@ -6,7 +6,7 @@ import {
   ExtensionContext,
 } from "vscode";
 
-import { advancedOpenFile } from "./advancedOpenFile"
+import { advancedOpenFile } from "./advancedOpenFile";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -18,7 +18,7 @@ export function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         commands.registerCommand('extension.advancedOpenFile', advancedOpenFile)
-    )
+    );
 }
 
 // this method is called when your extension is deactivated
