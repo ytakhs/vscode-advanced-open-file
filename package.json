@@ -34,15 +34,6 @@
         "configuration":{
             "title": "VscodeAdvancedOpenFile Configuration",
             "properties": {
-                "advancedOpenFile.excludeFiles": {
-                    "type": [
-                        "object",
-                        "null"
-                    ],
-                    "default": {
-                        "**/node_modules/**": true
-                    }
-                }
             }
         }
     },
