@@ -1,6 +1,6 @@
 # vscode-advanced-open-file README
 
-A extension to open or create files easily.
+VSCode extension for helping to open or create files.
 
 This extension is based on [advanced-open-file](https://github.com/Osmose/advanced-open-file) which is a package of Atom editor.
 
