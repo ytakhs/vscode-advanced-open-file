@@ -24,8 +24,10 @@ class FilePickItem implements QuickPickItem {
         this.relativePath = relativePath
         this.absolutePath = absolutePath
         this.label = this.relativePath
-        this.description = this.relativePath
         this.filetype = filetype
+        if (filetype == FileType.Directory) {
+            this.description = "Directory"
+        }
     }
 }
 
