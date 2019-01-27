@@ -1,7 +1,10 @@
 # Change Log
-All notable changes to the "vscode-advanced-open-file" extension will be documented in this file.
+## [v0.1.0]
+### Changed
+- Set directory of active file to input field as default value.
 
-Check [Keep a Changelog](http://keepachangelog.com/) for recommendations on how to structure this file.
+## [v0.0.2 - v0.0.6]
+- Add some changes
 
-## [Unreleased]
+## [v0.0.1]
 - Initial release
