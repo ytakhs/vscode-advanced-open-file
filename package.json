@@ -41,7 +41,8 @@
         "compile": "tsc -p ./",
         "watch": "tsc -watch -p ./",
         "postinstall": "node ./node_modules/vscode/bin/install",
-        "test": "yarn run compile && node ./node_modules/vscode/bin/test"
+        "test": "yarn run compile && node ./node_modules/vscode/bin/test",
+        "fmt": "prettier --write 'src/**/*.ts'"
     },
     "devDependencies": {
         "@types/glob": "^7.1.1",

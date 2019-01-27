@@ -1,13 +1,5 @@
 "use strict"
-import {
-  window,
-  FileType,
-  QuickPick,
-  QuickPickItem,
-  workspace,
-  WorkspaceFolder,
-  Disposable,
-} from "vscode"
+import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder, Disposable } from "vscode"
 
 import * as path from "path"
 import * as fs from "fs"
@@ -43,12 +35,9 @@ function detectFileType(stat: fs.Stats): FileType {
   }
 }
 
-function createFilePickItems(
-  rootpath: string,
-  dir: string
-): Promise<ReadonlyArray<QuickPickItem>> {
+function createFilePickItems(rootPath: string, dir: string): Promise<ReadonlyArray<QuickPickItem>> {
   return new Promise(resolve => {
-    const currentpath = path.join(rootpath, dir)
+    const currentpath = path.join(rootPath, dir)
     fs.readdir(currentpath, { encoding: "utf-8" }, (err, files) => {
       const filePickItems = files.map(f => {
         const absolutePath = path.join(currentpath, f)
@@ -62,10 +51,7 @@ function createFilePickItems(
   })
 }
 
-function createFilePicker(
-  value: string,
-  items: ReadonlyArray<QuickPickItem>
-): QuickPick<QuickPickItem> {
+function createFilePicker(value: string, items: ReadonlyArray<QuickPickItem>): QuickPick<QuickPickItem> {
   const quickpick = window.createQuickPick()
   quickpick.value = value
   quickpick.items = items
@@ -76,7 +62,7 @@ function createFilePicker(
 
 async function pickFile(
   value: string,
-  rootpath: string,
+  rootPath: string,
   items: ReadonlyArray<QuickPickItem>
 ): Promise<QuickPickItem | string | undefined> {
   const quickpick = createFilePicker(value, items)
@@ -84,27 +70,25 @@ async function pickFile(
   quickpick.show()
 
   const disposables: Disposable[] = []
-  const pickedItem = await new Promise<QuickPickItem | string | undefined>(
-    resolve => {
-      disposables.push(
-        quickpick.onDidChangeValue(value => {
-          createFilePickItems(rootpath, value).then(items => {
-            quickpick.items = items
-          })
+  const pickedItem = await new Promise<QuickPickItem | string | undefined>(resolve => {
+    disposables.push(
+      quickpick.onDidChangeValue(value => {
+        createFilePickItems(rootPath, value).then(items => {
+          quickpick.items = items
         })
-      )
+      })
+    )
 
-      disposables.push(
-        quickpick.onDidAccept(() => {
-          if (quickpick.selectedItems[0]) {
-            resolve(quickpick.selectedItems[0])
-          } else {
-            resolve(quickpick.value)
-          }
-        })
-      )
-    }
-  )
+    disposables.push(
+      quickpick.onDidAccept(() => {
+        if (quickpick.selectedItems[0]) {
+          resolve(quickpick.selectedItems[0])
+        } else {
+          resolve(quickpick.value)
+        }
+      })
+    )
+  })
 
   quickpick.hide()
 
@@ -115,8 +99,8 @@ async function pickFile(
     return pickedItem
   } else if (pickedItem instanceof FilePickItem) {
     if (pickedItem.filetype === FileType.Directory) {
-      const items = await createFilePickItems(rootpath, pickedItem.relativePath)
-      return pickFile(pickedItem.label, rootpath, items)
+      const items = await createFilePickItems(rootPath, pickedItem.relativePath)
+      return pickFile(pickedItem.label, rootPath, items)
     } else {
       return pickedItem
     }
@@ -147,28 +131,44 @@ async function openFile(path: string): Promise<void> {
   }
 }
 
+function detectdefaultDir(rootPath: string, currentPath: string): string {
+  const rootParts = rootPath.split("/")
+  const currentParts = currentPath.split("/")
+  if (rootParts.length === currentParts.length) {
+    return ""
+  }
+
+  const fragment = currentParts[currentParts.length - 1]
+  const directoryPath = currentPath.substring(0, currentPath.length - fragment.length)
+
+  return directoryPath.substring(rootPath.length + 1, directoryPath.length)
+}
+
 export async function advancedOpenFile() {
   const currentEditor = window.activeTextEditor
   let targetWorkspaceFolder: WorkspaceFolder
+  let rootPath: string
+  let defaultDir: string
 
   if (!currentEditor) {
     targetWorkspaceFolder = await window.showWorkspaceFolderPick()
+    rootPath = targetWorkspaceFolder.uri.path
+    defaultDir = ""
   } else {
-    targetWorkspaceFolder = workspace.getWorkspaceFolder(
-      currentEditor.document.uri
-    )
+    targetWorkspaceFolder = workspace.getWorkspaceFolder(currentEditor.document.uri)
+    rootPath = targetWorkspaceFolder.uri.path
+    defaultDir = detectdefaultDir(rootPath, currentEditor.document.uri.path)
   }
 
-  const rootpath = targetWorkspaceFolder.uri.path
-  const filePickItems = await createFilePickItems(rootpath, "")
-  const pickedItem = await pickFile("", rootpath, filePickItems)
+  const filePickItems = await createFilePickItems(rootPath, defaultDir)
+  const pickedItem = await pickFile(defaultDir, rootPath, filePickItems)
 
   if (!pickedItem) {
     throw new Error("failed")
   }
 
   if (typeof pickedItem === "string") {
-    const newFilePath = path.join(rootpath, pickedItem)
+    const newFilePath = path.join(rootPath, pickedItem)
     try {
       await createFile(newFilePath)
     } catch (err) {
