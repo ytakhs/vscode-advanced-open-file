@@ -77,7 +77,9 @@ async function pickFile(
     disposables.push(
       quickpick.onDidChangeValue(value => {
         const currentDir = detectCurrentDir(rootPath, path.join(rootPath, value))
-        if (previousReadDir === currentDir) { return }
+        if (previousReadDir === currentDir) {
+          return
+        }
 
         createFilePickItems(rootPath, currentDir).then(items => {
           quickpick.items = items
