@@ -4,6 +4,8 @@ import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder,
 import * as path from "path"
 import * as fs from "fs"
 
+const pathSeparator = path.sep
+
 class FilePickItem implements QuickPickItem {
   relativePath: string
   absolutePath: string
@@ -66,6 +68,7 @@ async function pickFile(
   items: ReadonlyArray<QuickPickItem>
 ): Promise<QuickPickItem | string | undefined> {
   const quickpick = createFilePicker(value, items)
+  let previousReadDir: string = ""
 
   quickpick.show()
 
@@ -73,8 +76,12 @@ async function pickFile(
   const pickedItem = await new Promise<QuickPickItem | string | undefined>(resolve => {
     disposables.push(
       quickpick.onDidChangeValue(value => {
-        createFilePickItems(rootPath, value).then(items => {
+        const currentDir = detectCurrentDir(rootPath, path.join(rootPath, value))
+        if (previousReadDir === currentDir) { return }
+
+        createFilePickItems(rootPath, currentDir).then(items => {
           quickpick.items = items
+          previousReadDir = currentDir
         })
       })
     )
@@ -131,9 +138,9 @@ async function openFile(path: string): Promise<void> {
   }
 }
 
-function detectdefaultDir(rootPath: string, currentPath: string): string {
-  const rootParts = rootPath.split("/")
-  const currentParts = currentPath.split("/")
+function detectCurrentDir(rootPath: string, currentPath: string): string {
+  const rootParts = rootPath.split(pathSeparator)
+  const currentParts = currentPath.split(pathSeparator)
   if (rootParts.length === currentParts.length) {
     return ""
   }
@@ -157,7 +164,7 @@ export async function advancedOpenFile() {
   } else {
     targetWorkspaceFolder = workspace.getWorkspaceFolder(currentEditor.document.uri)
     rootPath = targetWorkspaceFolder.uri.path
-    defaultDir = detectdefaultDir(rootPath, currentEditor.document.uri.path)
+    defaultDir = detectCurrentDir(rootPath, currentEditor.document.uri.path)
   }
 
   const filePickItems = await createFilePickItems(rootPath, defaultDir)
