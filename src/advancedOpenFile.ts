@@ -66,20 +66,20 @@ async function pickFile(
   value: string,
   rootPath: string,
   items: ReadonlyArray<QuickPickItem>
-): Promise<QuickPickItem | string | undefined> {
+): Promise<QuickPickItem | string> {
     const quickpick = createFilePicker(value, items)
     const disposables: Disposable[] = []
 
   try {
-    let previousReadDir: string = ""
+    let previousReadDir: string | undefined = undefined
 
     quickpick.show()
 
-    const pickedItem = await new Promise<QuickPickItem | string | undefined>(resolve => {
+    const pickedItem = await new Promise<QuickPickItem | string>(resolve => {
       disposables.push(
         quickpick.onDidChangeValue(value => {
           const currentDir = detectCurrentDir(rootPath, path.join(rootPath, value))
-          if (previousReadDir === currentDir) {
+          if (previousReadDir && previousReadDir === currentDir) {
             return
           }
 
@@ -108,7 +108,7 @@ async function pickFile(
     } else if (pickedItem instanceof FilePickItem) {
       if (pickedItem.filetype === FileType.Directory) {
         const items = await createFilePickItems(rootPath, pickedItem.relativePath)
-        return pickFile(pickedItem.label, rootPath, items)
+        return pickFile(pickedItem.label + pathSeparator, rootPath, items)
       } else {
         return pickedItem
       }
