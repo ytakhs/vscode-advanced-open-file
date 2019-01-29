@@ -1,4 +1,14 @@
 # Change Log
+## [v0.1.2]
+### Fixed
+- Always call dispose method.
+- Skipping readdir when to be picked directory
+
+## [v0.1.1]
+### Fixed
+- Reduce times of calling readdir method on changing input value.
+- Use path.sep instead using POSIX path segment separator directly.
+
 ## [v0.1.0]
 ### Changed
 - Set directory of active file to input field as default value.
