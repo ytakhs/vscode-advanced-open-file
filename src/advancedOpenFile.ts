@@ -67,52 +67,55 @@ async function pickFile(
   rootPath: string,
   items: ReadonlyArray<QuickPickItem>
 ): Promise<QuickPickItem | string | undefined> {
-  const quickpick = createFilePicker(value, items)
-  let previousReadDir: string = ""
+    const quickpick = createFilePicker(value, items)
+    const disposables: Disposable[] = []
 
-  quickpick.show()
+  try {
+    let previousReadDir: string = ""
 
-  const disposables: Disposable[] = []
-  const pickedItem = await new Promise<QuickPickItem | string | undefined>(resolve => {
-    disposables.push(
-      quickpick.onDidChangeValue(value => {
-        const currentDir = detectCurrentDir(rootPath, path.join(rootPath, value))
-        if (previousReadDir === currentDir) {
-          return
-        }
+    quickpick.show()
 
-        createFilePickItems(rootPath, currentDir).then(items => {
-          quickpick.items = items
-          previousReadDir = currentDir
+    const pickedItem = await new Promise<QuickPickItem | string | undefined>(resolve => {
+      disposables.push(
+        quickpick.onDidChangeValue(value => {
+          const currentDir = detectCurrentDir(rootPath, path.join(rootPath, value))
+          if (previousReadDir === currentDir) {
+            return
+          }
+
+          createFilePickItems(rootPath, currentDir).then(items => {
+            quickpick.items = items
+            previousReadDir = currentDir
+          })
         })
-      })
-    )
+      )
 
-    disposables.push(
-      quickpick.onDidAccept(() => {
-        if (quickpick.selectedItems[0]) {
-          resolve(quickpick.selectedItems[0])
-        } else {
-          resolve(quickpick.value)
-        }
-      })
-    )
-  })
+      disposables.push(
+        quickpick.onDidAccept(() => {
+          if (quickpick.selectedItems[0]) {
+            resolve(quickpick.selectedItems[0])
+          } else {
+            resolve(quickpick.value)
+          }
+        })
+      )
+    })
 
-  quickpick.hide()
+    quickpick.hide()
 
-  quickpick.dispose()
-  disposables.forEach(d => d.dispose())
-
-  if (typeof pickedItem === "string") {
-    return pickedItem
-  } else if (pickedItem instanceof FilePickItem) {
-    if (pickedItem.filetype === FileType.Directory) {
-      const items = await createFilePickItems(rootPath, pickedItem.relativePath)
-      return pickFile(pickedItem.label, rootPath, items)
-    } else {
+    if (typeof pickedItem === "string") {
       return pickedItem
+    } else if (pickedItem instanceof FilePickItem) {
+      if (pickedItem.filetype === FileType.Directory) {
+        const items = await createFilePickItems(rootPath, pickedItem.relativePath)
+        return pickFile(pickedItem.label, rootPath, items)
+      } else {
+        return pickedItem
+      }
     }
+  } finally {
+    quickpick.dispose()
+    disposables.forEach(d => d.dispose())
   }
 }
 
