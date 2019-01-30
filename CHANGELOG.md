@@ -1,4 +1,8 @@
 # Change Log
+## [v0.1.3]
+### Changed
+- Create directories recursively if directories does not exists on creating file.
+
 ## [v0.1.2]
 ### Fixed
 - Always call dispose method.
