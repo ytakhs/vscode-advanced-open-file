@@ -45,6 +45,7 @@
         "fmt": "prettier --write 'src/**/*.ts'"
     },
     "devDependencies": {
+        "@types/mkdirp": "^0.5.2",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.10.2",
         "prettier": "^1.16.1",
@@ -52,5 +53,7 @@
         "typescript": "^3.2.4",
         "vscode": "^1.1.26"
     },
-    "dependencies": {}
+    "dependencies": {
+        "node-mkdirp": "^0.0.1"
+    }
 }

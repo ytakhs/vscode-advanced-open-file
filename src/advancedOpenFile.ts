@@ -3,6 +3,7 @@ import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder,
 
 import * as path from "path"
 import * as fs from "fs"
+import * as mkdirp from "mkdirp"
 
 const pathSeparator = path.sep
 
@@ -67,8 +68,8 @@ async function pickFile(
   rootPath: string,
   items: ReadonlyArray<QuickPickItem>
 ): Promise<QuickPickItem | string> {
-    const quickpick = createFilePicker(value, items)
-    const disposables: Disposable[] = []
+  const quickpick = createFilePicker(value, items)
+  const disposables: Disposable[] = []
 
   try {
     let previousReadDir: string | undefined = undefined
@@ -131,6 +132,20 @@ function createFile(path: string): Promise<void> {
   })
 }
 
+function createDir(dir: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if (!fs.existsSync(dir)) {
+      mkdirp(dir, (err, made) => {
+        if (err) {
+          reject(err)
+        }
+
+        resolve(made)
+      })
+    }
+  })
+}
+
 async function openFile(path: string): Promise<void> {
   const document = await workspace.openTextDocument(path)
   if (!document) {
@@ -182,6 +197,11 @@ export async function advancedOpenFile() {
   if (typeof pickedItem === "string") {
     const newFilePath = path.join(rootPath, pickedItem)
     try {
+      const parts = newFilePath.split(pathSeparator)
+      const fragment = parts[parts.length - 1]
+      const direcotry = newFilePath.substring(0, newFilePath.length - fragment.length)
+
+      await createDir(direcotry)
       await createFile(newFilePath)
     } catch (err) {
       window.showWarningMessage(`${err}: ${newFilePath} already exists.`)
