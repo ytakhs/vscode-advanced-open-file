@@ -54,6 +54,6 @@
         "vscode": "^1.1.26"
     },
     "dependencies": {
-        "node-mkdirp": "^0.0.1"
+        "mkdirp": "^0.5.1"
     }
 }
