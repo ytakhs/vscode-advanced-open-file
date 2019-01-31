@@ -132,7 +132,7 @@ function createFile(path: string): Promise<void> {
   })
 }
 
-function createDir(dir: string): Promise<string> {
+function createDir(dir: string): Promise<void> {
   return new Promise((resolve, reject) => {
     if (!fs.existsSync(dir)) {
       mkdirp(dir, (err, made) => {
@@ -140,8 +140,10 @@ function createDir(dir: string): Promise<string> {
           reject(err)
         }
 
-        resolve(made)
+        resolve()
       })
+    } else {
+      resolve()
     }
   })
 }
