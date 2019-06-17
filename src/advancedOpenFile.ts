@@ -6,6 +6,12 @@ import * as fs from "fs"
 import * as mkdirp from "mkdirp"
 
 const pathSeparator = path.sep
+const icons = {
+  [FileType.File]: "$(file)",
+  [FileType.Directory]: "$(file-directory)",
+  [FileType.SymbolicLink]: "$(file-symlink-file)",
+  [FileType.Unknown]: "$(file)",
+}
 
 class FilePickItem implements QuickPickItem {
   relativePath: string
@@ -18,11 +24,8 @@ class FilePickItem implements QuickPickItem {
   constructor(relativePath: string, absolutePath: string, filetype: FileType) {
     this.relativePath = relativePath
     this.absolutePath = absolutePath
-    this.label = this.relativePath
+    this.label = `${icons[filetype]} ${this.relativePath}`
     this.filetype = filetype
-    if (filetype === FileType.Directory) {
-      this.description = "Directory"
-    }
   }
 }
 
@@ -109,7 +112,7 @@ async function pickFile(
     } else if (pickedItem instanceof FilePickItem) {
       if (pickedItem.filetype === FileType.Directory) {
         const items = await createFilePickItems(rootPath, pickedItem.relativePath)
-        return pickFile(pickedItem.label + pathSeparator, rootPath, items)
+        return pickFile(pickedItem.relativePath + pathSeparator, rootPath, items)
       } else {
         return pickedItem
       }
