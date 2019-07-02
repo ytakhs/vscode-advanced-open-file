@@ -1,4 +1,12 @@
 # Change Log
+## [v0.1.5]
+### Fixed
+- Fix to call resolve in Promise.
+
+## [v0.1.4]
+### Fixed
+- Fix package name
+
 ## [v0.1.3]
 ### Changed
 - Create directories recursively if directories does not exists on creating file.
