@@ -1,4 +1,8 @@
 # Change Log
+## [v0.1.6]
+### Changed
+- Use octicons to denote files/directories/symlinks instead of description. ([#3](https://github.com/jit-y/vscode-advanced-open-file/pull/3)) Thanks Osmose!
+
 ## [v0.1.5]
 ### Fixed
 - Fix to call resolve in Promise.
