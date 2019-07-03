@@ -2,7 +2,7 @@
     "name": "vscode-advanced-open-file",
     "displayName": "vscode-advanced-open-file",
     "description": "",
-    "version": "0.1.6",
+    "version": "0.1.7",
     "publisher": "jit-y",
     "repository": {
         "type": "git",

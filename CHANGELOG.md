@@ -1,4 +1,8 @@
 # Change Log
+## [v0.1.7]
+### Changed
+- Use absolute paths to support opening files outside workspace.([#4](https://github.com/jit-y/vscode-advanced-open-file/pull/4)) Thanks Osmose!
+
 ## [v0.1.6]
 ### Changed
 - Use octicons to denote files/directories/symlinks instead of description. ([#3](https://github.com/jit-y/vscode-advanced-open-file/pull/3)) Thanks Osmose!
