@@ -4,8 +4,10 @@ import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder,
 import * as path from "path"
 import * as fs from "fs"
 import * as mkdirp from "mkdirp"
+import * as os from "os"
 
 const pathSeparator = path.sep
+const fsRoot = os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/"
 const icons = {
   [FileType.File]: "$(file)",
   [FileType.Directory]: "$(file-directory)",
@@ -14,17 +16,17 @@ const icons = {
 }
 
 class FilePickItem implements QuickPickItem {
-  relativePath: string
   absolutePath: string
+  alwaysShow: boolean
   label: string
   detail: string
   description: string
   filetype: FileType
 
-  constructor(relativePath: string, absolutePath: string, filetype: FileType) {
-    this.relativePath = relativePath
+  constructor(absolutePath: string, filetype: FileType, label?: string) {
     this.absolutePath = absolutePath
-    this.label = `${icons[filetype]} ${this.relativePath}`
+    this.label = `${icons[filetype]} ${label || path.basename(absolutePath)}`
+    this.alwaysShow = true
     this.filetype = filetype
   }
 }
@@ -41,17 +43,35 @@ function detectFileType(stat: fs.Stats): FileType {
   }
 }
 
-function createFilePickItems(rootPath: string, dir: string): Promise<ReadonlyArray<QuickPickItem>> {
+function createFilePickItems(value: string): Promise<ReadonlyArray<QuickPickItem>> {
   return new Promise(resolve => {
-    const currentpath = path.join(rootPath, dir)
-    fs.readdir(currentpath, { encoding: "utf-8" }, (err, files) => {
-      const filePickItems = files.map(f => {
-        const absolutePath = path.join(currentpath, f)
-        const filetype = detectFileType(fs.statSync(absolutePath))
+    let directory = value
+    let fragment = ""
+    if (!value.endsWith(pathSeparator)) {
+      directory = path.dirname(value)
+      fragment = path.basename(value)
+    }
 
-        return new FilePickItem(path.join(dir, f), absolutePath, filetype)
+    fs.readdir(directory, { encoding: "utf-8" }, (err, files) => {
+      let matchedFiles = files.filter(f => {
+        if (fragment.toLowerCase() === fragment) {
+          return f.toLowerCase().startsWith(fragment)
+        }
+
+        return f.startsWith(fragment)
       })
 
+      const filePickItems = matchedFiles.map(f => {
+        const absolutePath = path.join(directory, f)
+        const filetype = detectFileType(fs.statSync(absolutePath))
+
+        return new FilePickItem(absolutePath, filetype)
+      })
+
+      if (!fragment && directory !== fsRoot) {
+        const parent = path.dirname(directory)
+        filePickItems.unshift(new FilePickItem(parent, FileType.Directory, ".."))
+      }
       resolve(filePickItems)
     })
   })
@@ -66,30 +86,18 @@ function createFilePicker(value: string, items: ReadonlyArray<QuickPickItem>): Q
   return quickpick
 }
 
-async function pickFile(
-  value: string,
-  rootPath: string,
-  items: ReadonlyArray<QuickPickItem>
-): Promise<QuickPickItem | string> {
+async function pickFile(value: string, items: ReadonlyArray<QuickPickItem>): Promise<QuickPickItem | string> {
   const quickpick = createFilePicker(value, items)
   const disposables: Disposable[] = []
 
   try {
-    let previousReadDir: string | undefined = undefined
-
     quickpick.show()
 
     const pickedItem = await new Promise<QuickPickItem | string>(resolve => {
       disposables.push(
         quickpick.onDidChangeValue(value => {
-          const currentDir = detectCurrentDir(rootPath, path.join(rootPath, value))
-          if (previousReadDir && previousReadDir === currentDir) {
-            return
-          }
-
-          createFilePickItems(rootPath, currentDir).then(items => {
+          createFilePickItems(value).then(items => {
             quickpick.items = items
-            previousReadDir = currentDir
           })
         })
       )
@@ -111,8 +119,9 @@ async function pickFile(
       return pickedItem
     } else if (pickedItem instanceof FilePickItem) {
       if (pickedItem.filetype === FileType.Directory) {
-        const items = await createFilePickItems(rootPath, pickedItem.relativePath)
-        return pickFile(pickedItem.relativePath + pathSeparator, rootPath, items)
+        const directory = pickedItem.absolutePath + (pickedItem.absolutePath === fsRoot ? "" : pathSeparator)
+        const items = await createFilePickItems(directory)
+        return pickFile(directory, items)
       } else {
         return pickedItem
       }
@@ -163,44 +172,28 @@ async function openFile(path: string): Promise<void> {
   }
 }
 
-function detectCurrentDir(rootPath: string, currentPath: string): string {
-  const rootParts = rootPath.split(pathSeparator)
-  const currentParts = currentPath.split(pathSeparator)
-  if (rootParts.length === currentParts.length) {
-    return ""
-  }
-
-  const fragment = currentParts[currentParts.length - 1]
-  const directoryPath = currentPath.substring(0, currentPath.length - fragment.length)
-
-  return directoryPath.substring(rootPath.length + 1, directoryPath.length)
-}
-
 export async function advancedOpenFile() {
   const currentEditor = window.activeTextEditor
   let targetWorkspaceFolder: WorkspaceFolder
-  let rootPath: string
   let defaultDir: string
 
   if (!currentEditor) {
     targetWorkspaceFolder = await window.showWorkspaceFolderPick()
-    rootPath = targetWorkspaceFolder.uri.path
-    defaultDir = ""
+    defaultDir = targetWorkspaceFolder.uri.path
   } else {
-    targetWorkspaceFolder = workspace.getWorkspaceFolder(currentEditor.document.uri)
-    rootPath = targetWorkspaceFolder.uri.path
-    defaultDir = detectCurrentDir(rootPath, currentEditor.document.uri.path)
+    defaultDir = path.dirname(currentEditor.document.uri.path)
   }
+  defaultDir += pathSeparator
 
-  const filePickItems = await createFilePickItems(rootPath, defaultDir)
-  const pickedItem = await pickFile(defaultDir, rootPath, filePickItems)
+  const filePickItems = await createFilePickItems(defaultDir)
+  const pickedItem = await pickFile(defaultDir, filePickItems)
 
   if (!pickedItem) {
     throw new Error("failed")
   }
 
   if (typeof pickedItem === "string") {
-    const newFilePath = path.join(rootPath, pickedItem)
+    const newFilePath = pickedItem
     try {
       const parts = newFilePath.split(pathSeparator)
       const fragment = parts[parts.length - 1]
