@@ -33,7 +33,13 @@
         ],
         "configuration": {
             "title": "VscodeAdvancedOpenFile Configuration",
-            "properties": {}
+            "properties": {
+              "VscodeAdvancedOpenFile.selectPath": {
+                "type": "boolean",
+                "default": true,
+                "description": "Select the path when QuickPick opens"
+              }
+            }
         }
     },
     "scripts": {
