@@ -1,4 +1,8 @@
 # Change Log
+## [v0.1.8]
+### Added
+- Add `vscode-advanced-open-file.selectPath` option for enabling or disabling path selection on opening filter box. ([#5](https://github.com/jit-y/vscode-advanced-open-file/pull/12)) Thanks turara!
+
 ## [v0.1.7]
 ### Changed
 - Use absolute paths to support opening files outside workspace.([#4](https://github.com/jit-y/vscode-advanced-open-file/pull/4)) Thanks Osmose!
