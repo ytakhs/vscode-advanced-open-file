@@ -188,7 +188,7 @@ async function openFile(path: string): Promise<void> {
 }
 
 export async function advancedOpenFile() {
-  const selectValue: boolean = workspace.getConfiguration().get("VscodeAdvancedOpenFile.selectPath")
+  const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath")
 
   const currentEditor = window.activeTextEditor
   let targetWorkspaceFolder: WorkspaceFolder
