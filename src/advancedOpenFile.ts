@@ -77,21 +77,36 @@ function createFilePickItems(value: string): Promise<ReadonlyArray<QuickPickItem
   })
 }
 
-function createFilePicker(value: string, items: ReadonlyArray<QuickPickItem>): QuickPick<QuickPickItem> {
+function createFilePicker(
+  value: string,
+  items: ReadonlyArray<QuickPickItem>,
+  selectValue: boolean
+): QuickPick<QuickPickItem> {
   const quickpick = window.createQuickPick()
-  quickpick.value = value
   quickpick.items = items
   quickpick.placeholder = "select file"
+
+  if (selectValue) {
+    quickpick.value = value
+  }
 
   return quickpick
 }
 
-async function pickFile(value: string, items: ReadonlyArray<QuickPickItem>): Promise<QuickPickItem | string> {
-  const quickpick = createFilePicker(value, items)
+async function pickFile(
+  value: string,
+  items: ReadonlyArray<QuickPickItem>,
+  selectValue: boolean
+): Promise<QuickPickItem | string> {
+  const quickpick = createFilePicker(value, items, selectValue)
   const disposables: Disposable[] = []
 
   try {
     quickpick.show()
+
+    if (!selectValue) {
+      quickpick.value = value
+    }
 
     const pickedItem = await new Promise<QuickPickItem | string>(resolve => {
       disposables.push(
@@ -121,7 +136,7 @@ async function pickFile(value: string, items: ReadonlyArray<QuickPickItem>): Pro
       if (pickedItem.filetype === FileType.Directory) {
         const directory = pickedItem.absolutePath + (pickedItem.absolutePath === fsRoot ? "" : pathSeparator)
         const items = await createFilePickItems(directory)
-        return pickFile(directory, items)
+        return pickFile(directory, items, selectValue)
       } else {
         return pickedItem
       }
@@ -173,6 +188,8 @@ async function openFile(path: string): Promise<void> {
 }
 
 export async function advancedOpenFile() {
+  const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath")
+
   const currentEditor = window.activeTextEditor
   let targetWorkspaceFolder: WorkspaceFolder
   let defaultDir: string
@@ -186,7 +203,7 @@ export async function advancedOpenFile() {
   defaultDir += pathSeparator
 
   const filePickItems = await createFilePickItems(defaultDir)
-  const pickedItem = await pickFile(defaultDir, filePickItems)
+  const pickedItem = await pickFile(defaultDir, filePickItems, selectValue)
 
   if (!pickedItem) {
     throw new Error("failed")
