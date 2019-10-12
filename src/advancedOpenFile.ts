@@ -1,80 +1,80 @@
-"use strict"
-import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder, Disposable } from "vscode"
+"use strict";
+import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder, Disposable } from "vscode";
 
-import * as path from "path"
-import * as fs from "fs"
-import * as mkdirp from "mkdirp"
-import * as os from "os"
+import * as path from "path";
+import * as fs from "fs";
+import * as mkdirp from "mkdirp";
+import * as os from "os";
 
-const pathSeparator = path.sep
-const fsRoot = os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/"
+const pathSeparator = path.sep;
+const fsRoot = os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/";
 const icons = {
   [FileType.File]: "$(file)",
   [FileType.Directory]: "$(file-directory)",
   [FileType.SymbolicLink]: "$(file-symlink-file)",
   [FileType.Unknown]: "$(file)",
-}
+};
 
 class FilePickItem implements QuickPickItem {
-  absolutePath: string
-  alwaysShow: boolean
-  label: string
-  detail: string
-  description: string
-  filetype: FileType
+  absolutePath: string;
+  alwaysShow: boolean;
+  label: string;
+  detail: string;
+  description: string;
+  filetype: FileType;
 
   constructor(absolutePath: string, filetype: FileType, label?: string) {
-    this.absolutePath = absolutePath
-    this.label = `${icons[filetype]} ${label || path.basename(absolutePath)}`
-    this.alwaysShow = true
-    this.filetype = filetype
+    this.absolutePath = absolutePath;
+    this.label = `${icons[filetype]} ${label || path.basename(absolutePath)}`;
+    this.alwaysShow = true;
+    this.filetype = filetype;
   }
 }
 
 function detectFileType(stat: fs.Stats): FileType {
   if (stat.isFile()) {
-    return FileType.File
+    return FileType.File;
   } else if (stat.isDirectory()) {
-    return FileType.Directory
+    return FileType.Directory;
   } else if (stat.isSymbolicLink()) {
-    return FileType.SymbolicLink
+    return FileType.SymbolicLink;
   } else {
-    return FileType.Unknown
+    return FileType.Unknown;
   }
 }
 
 function createFilePickItems(value: string): Promise<ReadonlyArray<QuickPickItem>> {
   return new Promise(resolve => {
-    let directory = value
-    let fragment = ""
+    let directory = value;
+    let fragment = "";
     if (!value.endsWith(pathSeparator)) {
-      directory = path.dirname(value)
-      fragment = path.basename(value)
+      directory = path.dirname(value);
+      fragment = path.basename(value);
     }
 
     fs.readdir(directory, { encoding: "utf-8" }, (err, files) => {
       let matchedFiles = files.filter(f => {
         if (fragment.toLowerCase() === fragment) {
-          return f.toLowerCase().startsWith(fragment)
+          return f.toLowerCase().startsWith(fragment);
         }
 
-        return f.startsWith(fragment)
-      })
+        return f.startsWith(fragment);
+      });
 
       const filePickItems = matchedFiles.map(f => {
-        const absolutePath = path.join(directory, f)
-        const filetype = detectFileType(fs.statSync(absolutePath))
+        const absolutePath = path.join(directory, f);
+        const filetype = detectFileType(fs.statSync(absolutePath));
 
-        return new FilePickItem(absolutePath, filetype)
-      })
+        return new FilePickItem(absolutePath, filetype);
+      });
 
       if (!fragment && directory !== fsRoot) {
-        const parent = path.dirname(directory)
-        filePickItems.unshift(new FilePickItem(parent, FileType.Directory, ".."))
+        const parent = path.dirname(directory);
+        filePickItems.unshift(new FilePickItem(parent, FileType.Directory, ".."));
       }
-      resolve(filePickItems)
-    })
-  })
+      resolve(filePickItems);
+    });
+  });
 }
 
 function createFilePicker(
@@ -82,15 +82,15 @@ function createFilePicker(
   items: ReadonlyArray<QuickPickItem>,
   selectValue: boolean
 ): QuickPick<QuickPickItem> {
-  const quickpick = window.createQuickPick()
-  quickpick.items = items
-  quickpick.placeholder = "select file"
+  const quickpick = window.createQuickPick();
+  quickpick.items = items;
+  quickpick.placeholder = "select file";
 
   if (selectValue) {
-    quickpick.value = value
+    quickpick.value = value;
   }
 
-  return quickpick
+  return quickpick;
 }
 
 async function pickFile(
@@ -98,52 +98,52 @@ async function pickFile(
   items: ReadonlyArray<QuickPickItem>,
   selectValue: boolean
 ): Promise<QuickPickItem | string> {
-  const quickpick = createFilePicker(value, items, selectValue)
-  const disposables: Disposable[] = []
+  const quickpick = createFilePicker(value, items, selectValue);
+  const disposables: Disposable[] = [];
 
   try {
-    quickpick.show()
+    quickpick.show();
 
     if (!selectValue) {
-      quickpick.value = value
+      quickpick.value = value;
     }
 
     const pickedItem = await new Promise<QuickPickItem | string>(resolve => {
       disposables.push(
         quickpick.onDidChangeValue(value => {
           createFilePickItems(value).then(items => {
-            quickpick.items = items
-          })
+            quickpick.items = items;
+          });
         })
-      )
+      );
 
       disposables.push(
         quickpick.onDidAccept(() => {
           if (quickpick.selectedItems[0]) {
-            resolve(quickpick.selectedItems[0])
+            resolve(quickpick.selectedItems[0]);
           } else {
-            resolve(quickpick.value)
+            resolve(quickpick.value);
           }
         })
-      )
-    })
+      );
+    });
 
-    quickpick.hide()
+    quickpick.hide();
 
     if (typeof pickedItem === "string") {
-      return pickedItem
+      return pickedItem;
     } else if (pickedItem instanceof FilePickItem) {
       if (pickedItem.filetype === FileType.Directory) {
-        const directory = pickedItem.absolutePath + (pickedItem.absolutePath === fsRoot ? "" : pathSeparator)
-        const items = await createFilePickItems(directory)
-        return pickFile(directory, items, selectValue)
+        const directory = pickedItem.absolutePath + (pickedItem.absolutePath === fsRoot ? "" : pathSeparator);
+        const items = await createFilePickItems(directory);
+        return pickFile(directory, items, selectValue);
       } else {
-        return pickedItem
+        return pickedItem;
       }
     }
   } finally {
-    quickpick.dispose()
-    disposables.forEach(d => d.dispose())
+    quickpick.dispose();
+    disposables.forEach(d => d.dispose());
   }
 }
 
@@ -151,12 +151,12 @@ function createFile(path: string): Promise<void> {
   return new Promise((resolve, reject) => {
     fs.appendFile(path, "", err => {
       if (err) {
-        reject(err)
+        reject(err);
       }
-    })
+    });
 
-    resolve()
-  })
+    resolve();
+  });
 }
 
 function createDir(dir: string): Promise<void> {
@@ -164,74 +164,74 @@ function createDir(dir: string): Promise<void> {
     if (!fs.existsSync(dir)) {
       mkdirp(dir, (err, made) => {
         if (err) {
-          reject(err)
+          reject(err);
         }
 
-        resolve()
-      })
+        resolve();
+      });
     } else {
-      resolve()
+      resolve();
     }
-  })
+  });
 }
 
 async function openFile(path: string): Promise<void> {
-  const document = await workspace.openTextDocument(path)
+  const document = await workspace.openTextDocument(path);
   if (!document) {
-    throw new Error("no such file exists")
+    throw new Error("no such file exists");
   }
 
-  const editor = await window.showTextDocument(document)
+  const editor = await window.showTextDocument(document);
   if (!editor) {
-    throw new Error("showing document failed.")
+    throw new Error("showing document failed.");
   }
 }
 
 export async function advancedOpenFile() {
-  const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath")
+  const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath");
 
-  const currentEditor = window.activeTextEditor
-  let targetWorkspaceFolder: WorkspaceFolder
-  let defaultDir: string
+  const currentEditor = window.activeTextEditor;
+  let targetWorkspaceFolder: WorkspaceFolder;
+  let defaultDir: string;
 
   if (!currentEditor) {
-    targetWorkspaceFolder = await window.showWorkspaceFolderPick()
-    defaultDir = targetWorkspaceFolder.uri.path
+    targetWorkspaceFolder = await window.showWorkspaceFolderPick();
+    defaultDir = targetWorkspaceFolder.uri.path;
   } else {
-    defaultDir = path.dirname(currentEditor.document.uri.path)
+    defaultDir = path.dirname(currentEditor.document.uri.path);
   }
-  defaultDir += pathSeparator
+  defaultDir += pathSeparator;
 
-  const filePickItems = await createFilePickItems(defaultDir)
-  const pickedItem = await pickFile(defaultDir, filePickItems, selectValue)
+  const filePickItems = await createFilePickItems(defaultDir);
+  const pickedItem = await pickFile(defaultDir, filePickItems, selectValue);
 
   if (!pickedItem) {
-    throw new Error("failed")
+    throw new Error("failed");
   }
 
   if (typeof pickedItem === "string") {
-    const newFilePath = pickedItem
+    const newFilePath = pickedItem;
     try {
-      const parts = newFilePath.split(pathSeparator)
-      const fragment = parts[parts.length - 1]
-      const direcotry = newFilePath.substring(0, newFilePath.length - fragment.length)
+      const parts = newFilePath.split(pathSeparator);
+      const fragment = parts[parts.length - 1];
+      const direcotry = newFilePath.substring(0, newFilePath.length - fragment.length);
 
-      await createDir(direcotry)
-      await createFile(newFilePath)
+      await createDir(direcotry);
+      await createFile(newFilePath);
     } catch (err) {
-      window.showWarningMessage(`${err}: ${newFilePath} already exists.`)
+      window.showWarningMessage(`${err}: ${newFilePath} already exists.`);
     }
 
     try {
-      await openFile(newFilePath)
+      await openFile(newFilePath);
     } catch (err) {
-      window.showWarningMessage(err)
+      window.showWarningMessage(err);
     }
   } else if (pickedItem instanceof FilePickItem) {
     try {
-      await openFile(pickedItem.absolutePath)
+      await openFile(pickedItem.absolutePath);
     } catch (err) {
-      window.showWarningMessage(err)
+      window.showWarningMessage(err);
     }
   }
 }
