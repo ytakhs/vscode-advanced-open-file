@@ -1,15 +1,22 @@
 {
+	"extends": [
+		"tslint-config-prettier"
+	],
 	"rules": {
 		"no-string-throw": true,
 		"no-unused-expression": true,
 		"no-duplicate-variable": true,
+		"no-namespace": true,
 		"curly": true,
 		"class-name": true,
-		"semicolon": [
-			true,
-			"always"
-		],
-		"triple-equals": true
+		"triple-equals": true,
+		"variable-name": {
+			"options": [
+				"check-format",
+				"allow-pascal-case",
+				"allow-leading-underscore"
+			]
+		}
 	},
 	"defaultSeverity": "warning"
 }
