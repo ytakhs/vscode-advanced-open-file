@@ -14,7 +14,7 @@ This extension is based on [advanced-open-file](https://github.com/Osmose/advanc
 ## Settings
 ### `vscode-advanced-open-file.selectPath`
 
-If you set `false`, it is disabled path selection on opening filter box. (Default: `true`)
+If you set `true`, it is enabled path selection on opening filter box. (Default: `false`)
 
 ## LICENSE
 
