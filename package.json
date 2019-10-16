@@ -36,7 +36,7 @@
             "properties": {
                 "vscode-advanced-open-file.selectPath": {
                     "type": "boolean",
-                    "default": true,
+                    "default": false,
                     "description": "Select the path when QuickPick opens"
                 }
             }
