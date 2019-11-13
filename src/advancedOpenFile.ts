@@ -1,10 +1,9 @@
 "use strict";
-import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder, Disposable } from "vscode";
+import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder, Disposable, Uri } from "vscode";
 
 import * as path from "path";
-import * as fs from "fs";
-import * as mkdirp from "mkdirp";
 import * as os from "os";
+import { debug } from "util";
 
 const pathSeparator = path.sep;
 const fsRoot = os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/";
@@ -31,50 +30,48 @@ class FilePickItem implements QuickPickItem {
   }
 }
 
-function detectFileType(stat: fs.Stats): FileType {
-  if (stat.isFile()) {
-    return FileType.File;
-  } else if (stat.isDirectory()) {
-    return FileType.Directory;
-  } else if (stat.isSymbolicLink()) {
-    return FileType.SymbolicLink;
-  } else {
-    return FileType.Unknown;
+async function createFilePickItems(value: string): Promise<ReadonlyArray<QuickPickItem>> {
+  let directory = value;
+  let fragment = "";
+  if (!value.endsWith(pathSeparator)) {
+    directory = path.dirname(value);
+    fragment = path.basename(value);
   }
-}
 
-function createFilePickItems(value: string): Promise<ReadonlyArray<QuickPickItem>> {
-  return new Promise(resolve => {
-    let directory = value;
-    let fragment = "";
-    if (!value.endsWith(pathSeparator)) {
-      directory = path.dirname(value);
-      fragment = path.basename(value);
-    }
+  const uri = Uri.file(directory);
+  let filePickItems: Array<FilePickItem>;
 
-    fs.readdir(directory, { encoding: "utf-8" }, (err, files) => {
-      let matchedFiles = files.filter(f => {
-        if (fragment.toLowerCase() === fragment) {
-          return f.toLowerCase().startsWith(fragment);
-        }
-
-        return f.startsWith(fragment);
-      });
-
-      const filePickItems = matchedFiles.map(f => {
-        const absolutePath = path.join(directory, f);
-        const filetype = detectFileType(fs.statSync(absolutePath));
-
-        return new FilePickItem(absolutePath, filetype);
-      });
-
-      if (!fragment && directory !== fsRoot) {
-        const parent = path.dirname(directory);
-        filePickItems.unshift(new FilePickItem(parent, FileType.Directory, ".."));
+  try {
+    const files = await workspace.fs.readDirectory(uri);
+    let matchedFiles = files.filter(fileArr => {
+      const f = fileArr[0];
+      if (fragment.toLowerCase() === fragment) {
+        return f.toLowerCase().startsWith(fragment);
       }
-      resolve(filePickItems);
+
+      return f.startsWith(fragment);
     });
-  });
+
+    filePickItems = await Promise.all(
+      matchedFiles.map(async fileArr => {
+        const f = fileArr[0];
+        const absolutePath = path.join(directory, f);
+        const uri = Uri.file(absolutePath);
+        const fileType = await workspace.fs.stat(uri);
+
+        return new FilePickItem(absolutePath, fileType.type);
+      })
+    );
+
+    if (!fragment && directory !== fsRoot) {
+      const parent = path.dirname(directory);
+      filePickItems.unshift(new FilePickItem(parent, FileType.Directory, ".."));
+    }
+  } catch (e) {
+    filePickItems = [];
+  } finally {
+    return filePickItems;
+  }
 }
 
 function createFilePicker(
@@ -147,32 +144,23 @@ async function pickFile(
   }
 }
 
-function createFile(path: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    fs.appendFile(path, "", err => {
-      if (err) {
-        reject(err);
-      }
-    });
-
-    resolve();
-  });
+async function createFile(path: string): Promise<void> {
+  const uri = Uri.file(path);
+  const content = new Uint8Array(0);
+  try {
+    await workspace.fs.writeFile(uri, content);
+  } catch (e) {
+    throw new Error(e);
+  }
 }
 
-function createDir(dir: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (!fs.existsSync(dir)) {
-      mkdirp(dir, (err, made) => {
-        if (err) {
-          reject(err);
-        }
-
-        resolve();
-      });
-    } else {
-      resolve();
-    }
-  });
+async function createDir(dir: string): Promise<void> {
+  const uri = Uri.file(dir);
+  try {
+    await workspace.fs.createDirectory(uri);
+  } catch (e) {
+    throw new Error(e);
+  }
 }
 
 async function openFile(path: string): Promise<void> {
@@ -219,7 +207,7 @@ export async function advancedOpenFile() {
       await createDir(direcotry);
       await createFile(newFilePath);
     } catch (err) {
-      window.showWarningMessage(`${err}: ${newFilePath} already exists.`);
+      window.showWarningMessage(err);
     }
 
     try {
