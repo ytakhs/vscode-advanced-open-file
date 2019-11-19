@@ -52,7 +52,6 @@
         "tslint-check": "tslint-config-prettier-check ./tslint.json"
     },
     "devDependencies": {
-        "@types/mkdirp": "^0.5.2",
         "@types/mocha": "^2.2.42",
         "@types/node": "^7.10.2",
         "@types/vscode": "^1.38.0",
@@ -63,7 +62,5 @@
         "typescript": "^3.2.4",
         "vscode-test": "^1.2.3"
     },
-    "dependencies": {
-        "mkdirp": "^0.5.1"
-    }
+    "dependencies": {}
 }
