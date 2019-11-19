@@ -1,4 +1,8 @@
 # Change Log
+## [v0.2.0]
+### Changed
+- Update minimum version of vscode engine to ^1.38.0.
+
 ## [v0.1.9]
 ### Changed
 - Change default of `vscode-advanced-open-file.selectPath` option to false.
