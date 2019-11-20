@@ -179,11 +179,14 @@ export async function advancedOpenFile() {
   const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath");
 
   const currentEditor = window.activeTextEditor;
-  let targetWorkspaceFolder: WorkspaceFolder;
   let defaultDir: string;
 
   if (!currentEditor) {
-    targetWorkspaceFolder = await window.showWorkspaceFolderPick();
+    const targetWorkspaceFolder: WorkspaceFolder | undefined = await window.showWorkspaceFolderPick();
+    if (targetWorkspaceFolder === undefined) {
+      throw new Error("No workspace is opened.");
+    }
+
     defaultDir = targetWorkspaceFolder.uri.path;
   } else {
     defaultDir = path.dirname(currentEditor.document.uri.path);
