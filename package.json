@@ -53,13 +53,13 @@
     },
     "devDependencies": {
         "@types/mocha": "^2.2.42",
-        "@types/node": "^7.10.2",
+        "@types/node": "^12.12.11",
         "@types/vscode": "^1.38.0",
         "mocha": "^6.2.2",
         "prettier": "^1.16.1",
         "tslint": "^5.12.1",
         "tslint-config-prettier": "^1.18.0",
-        "typescript": "^3.2.4",
+        "typescript": "^3.7.0",
         "vscode-test": "^1.2.3"
     },
     "dependencies": {}

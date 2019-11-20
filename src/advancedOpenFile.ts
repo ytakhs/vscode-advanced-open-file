@@ -3,7 +3,6 @@ import { window, FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder,
 
 import * as path from "path";
 import * as os from "os";
-import { debug } from "util";
 
 const pathSeparator = path.sep;
 const fsRoot = os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/";
