@@ -38,6 +38,11 @@
                     "type": "boolean",
                     "default": false,
                     "description": "Select the path when QuickPick opens"
+                },
+                "vscode-advanced-open-file.groupDirectoriesFirst": {
+                    "type": "boolean",
+                    "default": false,
+                    "description": "Group directories before files"
                 }
             }
         }
