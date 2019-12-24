@@ -14,7 +14,11 @@ This extension is based on [advanced-open-file](https://github.com/Osmose/advanc
 ## Settings
 ### `vscode-advanced-open-file.selectPath`
 
-If you set `true`, it is enabled path selection on opening filter box. (Default: `false`)
+If set to `true`, when the picker is opened, the entire path will be selected (i.e. typing immediately will replace the path instead of adding to it). (Default: `false`)
+
+### `vscode-advanced-open-file.groupDirectoriesFirst`
+
+If set to `true`, directories will be grouped before files. (Default: `false`)
 
 ## LICENSE
 

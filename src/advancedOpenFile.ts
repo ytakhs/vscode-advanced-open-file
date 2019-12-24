@@ -62,6 +62,19 @@ async function createFilePickItems(value: string): Promise<ReadonlyArray<QuickPi
       })
     );
 
+    // Group directories first if desired
+    if (workspace.getConfiguration().get("vscode-advanced-open-file.groupDirectoriesFirst")) {
+      filePickItems.sort((fileA, fileB) => {
+        if (fileA.filetype === FileType.Directory && fileB.filetype !== FileType.Directory) {
+          return -1;
+        } else if (fileA.filetype !== FileType.Directory && fileB.filetype === FileType.Directory) {
+          return 1;
+        }
+
+        return 0;
+      });
+    }
+
     if (!fragment && directory !== fsRoot) {
       const parent = path.dirname(directory);
       filePickItems.unshift(new FilePickItem(parent, FileType.Directory, ".."));
