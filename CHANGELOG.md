@@ -1,4 +1,11 @@
 # Change Log
+## [v0.2.1]
+### Added
+- Add `vscode-advanced-open-file.groupDirectoriesFirst` option to group directories above files([#21](https://github.com/jit-y/vscode-advanced-open-file/pull/21/files)) Thanks Osmose!
+
+### Changed
+- Upgrade versions of TypeScript and @types/node.
+
 ## [v0.2.0]
 ### Changed
 - Update minimum version of vscode engine to ^1.38.0.
