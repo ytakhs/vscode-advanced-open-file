@@ -9,7 +9,7 @@
         "url": "https://github.com/jit-y/vscode-advanced-open-file"
     },
     "engines": {
-        "vscode": "^1.38.0"
+        "vscode": "^1.40.0"
     },
     "categories": [
         "Other"
@@ -59,7 +59,7 @@
     "devDependencies": {
         "@types/mocha": "^2.2.42",
         "@types/node": "^12.12.11",
-        "@types/vscode": "^1.38.0",
+        "@types/vscode": "1.40.0",
         "mocha": "^6.2.2",
         "prettier": "^1.16.1",
         "tslint": "^5.12.1",
