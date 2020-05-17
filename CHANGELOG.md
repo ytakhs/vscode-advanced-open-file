@@ -1,4 +1,8 @@
 # Change Log
+## [v0.2.2]
+- Update versions of some packages.
+- Update vscode enine version to 1.40.0.
+
 ## [v0.2.1]
 ### Added
 - Add `vscode-advanced-open-file.groupDirectoriesFirst` option to group directories above files([#21](https://github.com/jit-y/vscode-advanced-open-file/pull/21/files)) Thanks Osmose!
