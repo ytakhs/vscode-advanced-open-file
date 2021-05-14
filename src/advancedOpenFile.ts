@@ -104,9 +104,9 @@ function createFilePicker(
 
 async function pickFile(
   value: string,
-  items: ReadonlyArray<QuickPickItem>,
-  selectValue: boolean
+  items: ReadonlyArray<QuickPickItem>
 ): Promise<QuickPickItem | string> {
+  const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath");
   const quickpick = createFilePicker(value, items, selectValue);
   const disposables: Disposable[] = [];
 
@@ -145,7 +145,7 @@ async function pickFile(
       if (pickedItem.filetype === FileType.Directory) {
         const directory = pickedItem.absolutePath + (pickedItem.absolutePath === fsRoot ? "" : pathSeparator);
         const items = await createFilePickItems(directory);
-        return pickFile(directory, items, selectValue);
+        return pickFile(directory, items);
       } else {
         return pickedItem;
       }
@@ -187,26 +187,11 @@ async function openFile(path: string): Promise<void> {
   }
 }
 
-export async function advancedOpenFile() {
-  const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath");
+async function advancedOpen(startingPoint: string) {
+  startingPoint += pathSeparator;
 
-  const currentEditor = window.activeTextEditor;
-  let defaultDir: string;
-
-  if (!currentEditor) {
-    const targetWorkspaceFolder: WorkspaceFolder | undefined = await window.showWorkspaceFolderPick();
-    if (targetWorkspaceFolder === undefined) {
-      throw new Error("No workspace is opened.");
-    }
-
-    defaultDir = targetWorkspaceFolder.uri.path;
-  } else {
-    defaultDir = path.dirname(currentEditor.document.uri.path);
-  }
-  defaultDir += pathSeparator;
-
-  const filePickItems = await createFilePickItems(defaultDir);
-  const pickedItem = await pickFile(defaultDir, filePickItems, selectValue);
+  const filePickItems = await createFilePickItems(startingPoint);
+  const pickedItem = await pickFile(startingPoint, filePickItems);
 
   if (!pickedItem) {
     throw new Error("failed");
@@ -237,4 +222,39 @@ export async function advancedOpenFile() {
       window.showWarningMessage(err);
     }
   }
+}
+
+async function pickWorkspace(): Promise<string> {
+  const targetWorkspaceFolder: WorkspaceFolder | undefined = await window.showWorkspaceFolderPick();
+  if (targetWorkspaceFolder === undefined) {
+    throw new Error("No workspace is opened.");
+  }
+
+  return targetWorkspaceFolder.uri.path;
+}
+
+async function pathToCurrentDirectory(): Promise<string> {
+  const currentEditor = window.activeTextEditor;
+  if (currentEditor) {
+    return path.dirname(currentEditor.document.uri.path);
+  }
+
+  return pickWorkspace();
+}
+
+async function pathToCurrentWorkspace(): Promise<string> {
+  const currentEditor = window.activeTextEditor;
+  if (currentEditor) {
+    return workspace.getWorkspaceFolder(currentEditor.document.uri).uri.path;
+  }
+
+  return pickWorkspace();
+}
+
+export async function advancedOpenFile() {
+  advancedOpen(await pathToCurrentDirectory())
+}
+
+export async function advancedOpenWorkspaceFile() {
+  advancedOpen(await pathToCurrentWorkspace());
 }

@@ -22,7 +22,11 @@
         "commands": [
             {
                 "command": "extension.advancedOpenFile",
-                "title": "Advanced Open File"
+                "title": "Advanced Open File: from active directory"
+            },
+            {
+                "command": "extension.advancedOpenWorkspaceFile",
+                "title": "Advanced Open File: from active workspace"
             }
         ],
         "keybindings": [
