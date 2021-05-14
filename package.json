@@ -15,7 +15,8 @@
         "Other"
     ],
     "activationEvents": [
-        "onCommand:extension.advancedOpenFile"
+        "onCommand:extension.advancedOpenFile",
+        "onCommand:extension.advancedOpenWorkspaceFile"
     ],
     "main": "./out/extension",
     "contributes": {
