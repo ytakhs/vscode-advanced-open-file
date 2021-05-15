@@ -102,10 +102,7 @@ function createFilePicker(
   return quickpick;
 }
 
-async function pickFile(
-  value: string,
-  items: ReadonlyArray<QuickPickItem>
-): Promise<QuickPickItem | string> {
+async function pickFile(value: string, items: ReadonlyArray<QuickPickItem>): Promise<QuickPickItem | string> {
   const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath");
   const quickpick = createFilePicker(value, items, selectValue);
   const disposables: Disposable[] = [];
@@ -252,7 +249,7 @@ async function pathToCurrentWorkspace(): Promise<string> {
 }
 
 export async function advancedOpenFile() {
-  advancedOpen(await pathToCurrentDirectory())
+  advancedOpen(await pathToCurrentDirectory());
 }
 
 export async function advancedOpenWorkspaceFile() {
