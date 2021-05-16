@@ -86,33 +86,22 @@ async function createFilePickItems(value: string): Promise<ReadonlyArray<QuickPi
   }
 }
 
-function createFilePicker(
-  value: string,
-  items: ReadonlyArray<QuickPickItem>,
-  selectValue: boolean
-): QuickPick<QuickPickItem> {
+function createFilePicker(value: string, items: ReadonlyArray<QuickPickItem>): QuickPick<QuickPickItem> {
   const quickpick = window.createQuickPick();
   quickpick.items = items;
   quickpick.placeholder = "select file";
-
-  if (selectValue) {
-    quickpick.value = value;
-  }
 
   return quickpick;
 }
 
 async function pickFile(value: string, items: ReadonlyArray<QuickPickItem>): Promise<QuickPickItem | string> {
-  const selectValue: boolean = workspace.getConfiguration().get("vscode-advanced-open-file.selectPath");
-  const quickpick = createFilePicker(value, items, selectValue);
+  const quickpick = createFilePicker(value, items);
   const disposables: Disposable[] = [];
 
   try {
     quickpick.show();
 
-    if (!selectValue) {
-      quickpick.value = value;
-    }
+    quickpick.value = value;
 
     const pickedItem = await new Promise<QuickPickItem | string>(resolve => {
       disposables.push(
