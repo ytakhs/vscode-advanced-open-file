@@ -12,10 +12,6 @@ This extension is based on [advanced-open-file](https://github.com/Osmose/advanc
 - Creating a new file if there is no file on typed relative path.
 
 ## Settings
-### `vscode-advanced-open-file.selectPath`
-
-If set to `true`, when the picker is opened, the entire path will be selected (i.e. typing immediately will replace the path instead of adding to it). (Default: `false`)
-
 ### `vscode-advanced-open-file.groupDirectoriesFirst`
 
 If set to `true`, directories will be grouped before files. (Default: `false`)
