@@ -1,7 +1,7 @@
 import * as os from "os";
 import * as Path from "path";
 import * as vscode from "vscode";
-import { FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder, Disposable, Uri } from "vscode";
+import { FileType, QuickPick, Uri } from "vscode";
 import { FileItem, createFileItems } from "./fileItem";
 
 export class AdvancedOpenFile {
