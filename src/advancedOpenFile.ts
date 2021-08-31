@@ -5,14 +5,22 @@ import { FileType, QuickPick, QuickPickItem, workspace, WorkspaceFolder, Disposa
 import { FileItem, createFileItems } from "./fileItem";
 
 export class AdvancedOpenFile {
-  currentPath: Uri;
-  picker: QuickPick<FileItem>;
-  items: ReadonlyArray<FileItem>;
+  private currentPath: Uri;
+  private picker: QuickPick<FileItem>;
 
   constructor(uri: Uri) {
     this.picker = this.initPicker();
     this.currentPath = uri;
-    this.items = [];
+  }
+
+  async pick() {
+    this.picker.enabled = false;
+    this.show();
+
+    this.picker.value = this.currentPath.fsPath;
+    this.picker.items = await createFileItems(this.currentPath.fsPath);
+
+    this.picker.enabled = true;
   }
 
   initPicker(): QuickPick<FileItem> {
@@ -28,29 +36,13 @@ export class AdvancedOpenFile {
     this.picker.show();
   }
 
-  hide() {
-    this.picker.hide();
-  }
-
   dispose() {
     this.picker.dispose();
   }
 
-  async pick() {
-    this.picker.enabled = false;
-    this.show();
-
-    this.picker.value = this.currentPath.fsPath;
-    this.items = await createFileItems(this.currentPath.fsPath);
-    this.picker.items = this.items;
-
-    this.picker.enabled = true;
-  }
-
   onDidChangeValue(value: string) {
     createFileItems(value).then((items: ReadonlyArray<FileItem>) => {
-      this.items = items;
-      this.picker.items = this.items;
+      this.picker.items = items;
     });
   }
 
@@ -99,7 +91,7 @@ export class AdvancedOpenFile {
   openFile() {
     this.dispose();
 
-    vscode.workspace.openTextDocument(this.currentPath).then(document => {
+    vscode.workspace.openTextDocument(this.currentPath).then((document) => {
       vscode.window.showTextDocument(document);
     });
   }
