@@ -39,7 +39,7 @@ export async function createFileItems(pathname: string): Promise<ReadonlyArray<F
   let filePickItems: Array<FileItem>;
 
   const files = await vscode.workspace.fs.readDirectory(uri);
-  let matchedFiles = files.filter(fileArr => {
+  let matchedFiles = files.filter((fileArr) => {
     const f = fileArr[0];
     if (fragment.toLowerCase() === fragment) {
       return f.toLowerCase().startsWith(fragment);
@@ -49,7 +49,7 @@ export async function createFileItems(pathname: string): Promise<ReadonlyArray<F
   });
 
   filePickItems = await Promise.all(
-    matchedFiles.map(async fileArr => {
+    matchedFiles.map(async (fileArr) => {
       const f = fileArr[0];
       const absolutePath = path.join(directory, f);
       const uri = Uri.file(absolutePath);
