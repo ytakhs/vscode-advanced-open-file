@@ -7,6 +7,7 @@ const icons = {
   [FileType.File]: "$(file)",
   [FileType.Directory]: "$(file-directory)",
   [FileType.SymbolicLink]: "$(file-symlink-file)",
+  [FileType.SymbolicLink | FileType.Directory]: "$(file-symlink-directory)",
   [FileType.Unknown]: "$(file)",
 };
 
