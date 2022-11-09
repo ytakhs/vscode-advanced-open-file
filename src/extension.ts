@@ -4,7 +4,8 @@ import { commands, ExtensionContext, WorkspaceFolder, Uri } from "vscode";
 import { AdvancedOpenFile } from "./advancedOpenFile";
 
 async function pickWorkspace(): Promise<string> {
-  const targetWorkspaceFolder: WorkspaceFolder | undefined = await vscode.window.showWorkspaceFolderPick();
+  const targetWorkspaceFolder: WorkspaceFolder | undefined =
+    await vscode.window.showWorkspaceFolderPick();
   if (targetWorkspaceFolder === undefined) {
     throw new Error("No workspace is opened.");
   }
@@ -24,7 +25,8 @@ async function pathToCurrentDirectory(): Promise<string> {
 async function pathToCurrentWorkspace(): Promise<string> {
   const currentEditor = vscode.window.activeTextEditor;
   if (currentEditor) {
-    return vscode.workspace.getWorkspaceFolder(currentEditor.document.uri).uri.path;
+    return vscode.workspace.getWorkspaceFolder(currentEditor.document.uri).uri
+      .path;
   }
 
   return pickWorkspace();
@@ -47,9 +49,14 @@ async function advancedOpenWorkspaceFile(): Promise<void> {
 }
 
 export function activate(context: ExtensionContext) {
-  context.subscriptions.push(commands.registerCommand("extension.advancedOpenFile", advancedOpenFile));
   context.subscriptions.push(
-    commands.registerCommand("extension.advancedOpenWorkspaceFile", advancedOpenWorkspaceFile)
+    commands.registerCommand("extension.advancedOpenFile", advancedOpenFile)
+  );
+  context.subscriptions.push(
+    commands.registerCommand(
+      "extension.advancedOpenWorkspaceFile",
+      advancedOpenWorkspaceFile
+    )
   );
 }
 

@@ -1,71 +1,77 @@
 {
-    "name": "vscode-advanced-open-file",
-    "displayName": "vscode-advanced-open-file",
-    "description": "",
-    "version": "0.3.1",
-    "publisher": "jit-y",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jit-y/vscode-advanced-open-file"
-    },
-    "engines": {
-        "vscode": "^1.50.0"
-    },
-    "categories": [
-        "Other"
+  "name": "vscode-advanced-open-file",
+  "displayName": "vscode-advanced-open-file",
+  "description": "",
+  "version": "0.3.1",
+  "publisher": "jit-y",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/jit-y/vscode-advanced-open-file"
+  },
+  "engines": {
+    "vscode": "^1.50.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onCommand:extension.advancedOpenFile",
+    "onCommand:extension.advancedOpenWorkspaceFile"
+  ],
+  "main": "./out/extension",
+  "contributes": {
+    "commands": [
+      {
+        "command": "extension.advancedOpenFile",
+        "title": "Advanced Open File: from active directory"
+      },
+      {
+        "command": "extension.advancedOpenWorkspaceFile",
+        "title": "Advanced Open File: from active workspace"
+      }
     ],
-    "activationEvents": [
-        "onCommand:extension.advancedOpenFile",
-        "onCommand:extension.advancedOpenWorkspaceFile"
+    "keybindings": [
+      {
+        "command": "extension.advancedOpenFile",
+        "key": "ctrl+x ctrl+f"
+      }
     ],
-    "main": "./out/extension",
-    "contributes": {
-        "commands": [
-            {
-                "command": "extension.advancedOpenFile",
-                "title": "Advanced Open File: from active directory"
-            },
-            {
-                "command": "extension.advancedOpenWorkspaceFile",
-                "title": "Advanced Open File: from active workspace"
-            }
-        ],
-        "keybindings": [
-            {
-                "command": "extension.advancedOpenFile",
-                "key": "ctrl+x ctrl+f"
-            }
-        ],
-        "configuration": {
-            "title": "VscodeAdvancedOpenFile Configuration",
-            "properties": {
-                "vscode-advanced-open-file.groupDirectoriesFirst": {
-                    "type": "boolean",
-                    "default": false,
-                    "description": "Group directories before files"
-                }
-            }
+    "configuration": {
+      "title": "VscodeAdvancedOpenFile Configuration",
+      "properties": {
+        "vscode-advanced-open-file.groupDirectoriesFirst": {
+          "type": "boolean",
+          "default": false,
+          "description": "Group directories before files"
         }
-    },
-    "scripts": {
-        "vscode:prepublish": "yarn run compile",
-        "compile": "tsc -p ./",
-        "watch": "tsc -watch -p ./",
-        "test": "yarn run compile && node ./out/test/runTest.js",
-        "fmt": "prettier --write 'src/**/*.ts'",
-        "prettier-check": "prettier --check 'src/**/*.ts'",
-        "tslint-check": "tslint-config-prettier-check ./tslint.json"
-    },
-    "devDependencies": {
-        "@types/mocha": "^2.2.42",
-        "@types/node": "^12.12.11",
-        "@types/vscode": "1.40.0",
-        "mocha": "^6.2.2",
-        "prettier": "^2.3.2",
-        "tslint": "^5.12.1",
-        "tslint-config-prettier": "^1.18.0",
-        "typescript": "^4.2.4",
-        "vscode-test": "^1.2.3"
-    },
-    "dependencies": {}
+      }
+    }
+  },
+  "scripts": {
+    "prepare": "husky install",
+    "vscode:prepublish": "yarn run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "test": "yarn run compile && node ./out/test/runTest.js",
+    "fmt": "prettier --write 'src/**/*.ts'",
+    "prettier-check": "prettier --check 'src/**/*.ts'",
+    "tslint-check": "tslint-config-prettier-check ./tslint.json"
+  },
+  "lint-staged": {
+    "*.{ts,json}": "prettier --write"
+  },
+  "devDependencies": {
+    "@types/mocha": "^2.2.42",
+    "@types/node": "^12.12.11",
+    "@types/vscode": "1.40.0",
+    "husky": "^8.0.2",
+    "lint-staged": "^13.0.3",
+    "mocha": "^6.2.2",
+    "prettier": "^2.3.2",
+    "tslint": "^5.12.1",
+    "tslint-config-prettier": "^1.18.0",
+    "typescript": "^4.2.4",
+    "vscode-test": "^1.2.3"
+  },
+  "dependencies": {}
 }

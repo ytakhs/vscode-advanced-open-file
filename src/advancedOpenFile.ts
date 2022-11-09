@@ -54,8 +54,11 @@ export class AdvancedOpenFile {
           this.openFile();
           break;
         default:
-          const fsRoot = os.platform() === "win32" ? process.cwd().split(Path.sep)[0] : "/";
-          const path = pickedItem.absolutePath + (pickedItem.absolutePath === fsRoot ? "" : Path.sep);
+          const fsRoot =
+            os.platform() === "win32" ? process.cwd().split(Path.sep)[0] : "/";
+          const path =
+            pickedItem.absolutePath +
+            (pickedItem.absolutePath === fsRoot ? "" : Path.sep);
           this.currentPath = Uri.file(path);
           this.pick();
           break;
@@ -76,7 +79,9 @@ export class AdvancedOpenFile {
     const path = this.currentPath.fsPath;
     const parts = path.split(Path.sep);
     const fragment = parts[parts.length - 1];
-    const directory = Uri.file(path.substring(0, path.length - fragment.length));
+    const directory = Uri.file(
+      path.substring(0, path.length - fragment.length)
+    );
 
     vscode.workspace.fs.createDirectory(directory).then(() => {
       const uri = Uri.file(path);
