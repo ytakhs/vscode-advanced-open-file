@@ -14,13 +14,10 @@ export class AdvancedOpenFile {
   }
 
   async pick() {
-    this.picker.enabled = false;
     this.show();
 
     this.picker.value = this.currentPath.fsPath;
     this.picker.items = await createFileItems(this.currentPath.fsPath);
-
-    this.picker.enabled = true;
   }
 
   initPicker(): QuickPick<FileItem> {
