@@ -27,7 +27,9 @@ export class FileItem implements QuickPickItem {
   }
 }
 
-export async function createFileItems(pathname: string): Promise<ReadonlyArray<FileItem>> {
+export async function createFileItems(
+  pathname: string
+): Promise<ReadonlyArray<FileItem>> {
   let directory = pathname;
   let fragment = "";
 
@@ -61,11 +63,21 @@ export async function createFileItems(pathname: string): Promise<ReadonlyArray<F
   );
 
   // Group directories first if desired
-  if (vscode.workspace.getConfiguration().get("vscode-advanced-open-file.groupDirectoriesFirst")) {
+  if (
+    vscode.workspace
+      .getConfiguration()
+      .get("vscode-advanced-open-file.groupDirectoriesFirst")
+  ) {
     filePickItems.sort((fileA, fileB) => {
-      if (fileA.filetype === FileType.Directory && fileB.filetype !== FileType.Directory) {
+      if (
+        fileA.filetype === FileType.Directory &&
+        fileB.filetype !== FileType.Directory
+      ) {
         return -1;
-      } else if (fileA.filetype !== FileType.Directory && fileB.filetype === FileType.Directory) {
+      } else if (
+        fileA.filetype !== FileType.Directory &&
+        fileB.filetype === FileType.Directory
+      ) {
         return 1;
       }
 
@@ -73,7 +85,8 @@ export async function createFileItems(pathname: string): Promise<ReadonlyArray<F
     });
   }
 
-  const fsRoot = os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/";
+  const fsRoot =
+    os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/";
   if (!fragment && directory !== fsRoot) {
     const parent = path.dirname(directory);
     filePickItems.unshift(new FileItem(parent, FileType.Directory, ".."));
