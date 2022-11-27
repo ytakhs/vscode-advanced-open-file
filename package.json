@@ -54,8 +54,8 @@
     "watch": "tsc -watch -p ./",
     "test": "yarn run compile && node ./out/test/runTest.js",
     "fmt": "prettier --write 'src/**/*.ts'",
-    "prettier-check": "prettier --check 'src/**/*.ts'",
-    "tslint-check": "tslint-config-prettier-check ./tslint.json"
+    "lint": "eslint -c .eslintrc.json --ext .ts src",
+    "prettier-check": "prettier --check 'src/**/*.ts'"
   },
   "lint-staged": {
     "*.{ts,json}": "prettier --write"
@@ -65,6 +65,10 @@
     "@types/mocha": "^2.2.42",
     "@types/node": "^12.12.11",
     "@types/vscode": "1.40.0",
+    "@typescript-eslint/eslint-plugin": "^5.44.0",
+    "@typescript-eslint/parser": "^5.44.0",
+    "eslint": "^8.28.0",
+    "eslint-config-prettier": "^8.5.0",
     "glob": "^8.0.3",
     "husky": "^8.0.2",
     "lint-staged": "^13.0.3",

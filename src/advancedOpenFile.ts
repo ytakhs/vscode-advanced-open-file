@@ -48,20 +48,17 @@ export class AdvancedOpenFile {
     const newFilepath = this.picker.value;
 
     if (pickedItem) {
-      switch (pickedItem.filetype) {
-        case FileType.File:
-          this.currentPath = Uri.file(pickedItem.absolutePath);
-          this.openFile();
-          break;
-        default:
-          const fsRoot =
-            os.platform() === "win32" ? process.cwd().split(Path.sep)[0] : "/";
-          const path =
-            pickedItem.absolutePath +
-            (pickedItem.absolutePath === fsRoot ? "" : Path.sep);
-          this.currentPath = Uri.file(path);
-          this.pick();
-          break;
+      if (pickedItem.filetype === FileType.File) {
+        this.currentPath = Uri.file(pickedItem.absolutePath);
+        this.openFile();
+      } else {
+        const fsRoot =
+          os.platform() === "win32" ? process.cwd().split(Path.sep)[0] : "/";
+        const path =
+          pickedItem.absolutePath +
+          (pickedItem.absolutePath === fsRoot ? "" : Path.sep);
+        this.currentPath = Uri.file(path);
+        this.pick();
       }
     } else {
       this.currentPath = Uri.file(newFilepath);
