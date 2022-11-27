@@ -55,7 +55,8 @@
     "test": "yarn run compile && node ./out/test/runTest.js",
     "fmt": "prettier --write 'src/**/*.ts'",
     "lint": "eslint -c .eslintrc.json --ext .ts src",
-    "prettier-check": "prettier --check 'src/**/*.ts'"
+    "prettier-check": "prettier --check 'src/**/*.ts'",
+    "deploy": "vsce publish --yarn"
   },
   "lint-staged": {
     "*.{ts,json}": "prettier --write"
@@ -75,6 +76,7 @@
     "mocha": "^6.2.2",
     "prettier": "^2.3.2",
     "typescript": "^4.9.3",
+    "vsce": "^2.14.0",
     "vscode-test": "^1.2.3"
   },
   "dependencies": {}
