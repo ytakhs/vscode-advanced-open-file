@@ -25,8 +25,14 @@ async function pathToCurrentDirectory(): Promise<string> {
 async function pathToCurrentWorkspace(): Promise<string> {
   const currentEditor = vscode.window.activeTextEditor;
   if (currentEditor) {
-    return vscode.workspace.getWorkspaceFolder(currentEditor.document.uri).uri
-      .path;
+    const folder = vscode.workspace.getWorkspaceFolder(
+      currentEditor.document.uri
+    );
+    if (folder === undefined) {
+      throw new Error("No workspace exists");
+    }
+
+    return folder.uri.path;
   }
 
   return pickWorkspace();

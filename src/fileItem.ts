@@ -15,8 +15,6 @@ export class FileItem implements QuickPickItem {
   absolutePath: string;
   alwaysShow: boolean;
   label: string;
-  detail: string;
-  description: string;
   filetype: FileType;
 
   constructor(absolutePath: string, filetype: FileType, label?: string) {

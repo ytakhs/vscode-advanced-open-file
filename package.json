@@ -61,9 +61,11 @@
     "*.{ts,json}": "prettier --write"
   },
   "devDependencies": {
+    "@types/glob": "^8.0.0",
     "@types/mocha": "^2.2.42",
     "@types/node": "^12.12.11",
     "@types/vscode": "1.40.0",
+    "glob": "^8.0.3",
     "husky": "^8.0.2",
     "lint-staged": "^13.0.3",
     "mocha": "^6.2.2",
