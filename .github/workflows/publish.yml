@@ -1,8 +1,5 @@
 name: publish extension
 on:
-  push:
-    branches:
-      - main
   release:
     types:
       - created
