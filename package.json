@@ -67,7 +67,7 @@
     "@types/node": "^12.12.11",
     "@types/vscode": "1.40.0",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@typescript-eslint/parser": "^5.44.0",
+    "@typescript-eslint/parser": "^5.51.0",
     "eslint": "^8.28.0",
     "eslint-config-prettier": "^8.5.0",
     "glob": "^8.0.3",
