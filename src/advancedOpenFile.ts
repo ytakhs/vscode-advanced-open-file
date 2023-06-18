@@ -48,7 +48,7 @@ export class AdvancedOpenFile {
     const newFilepath = this.picker.value;
 
     if (pickedItem) {
-      if (pickedItem.filetype === FileType.File) {
+      if ((pickedItem.filetype & FileType.File) > 0) {
         this.currentPath = Uri.file(pickedItem.absolutePath);
         this.openFile();
       } else {
