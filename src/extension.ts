@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import * as Path from "path";
 import * as vscode from "vscode";
 import { commands, ExtensionContext, WorkspaceFolder, Uri } from "vscode";
@@ -16,9 +17,14 @@ async function pickWorkspace(): Promise<string> {
 async function pathToCurrentDirectory(): Promise<string> {
   const currentEditor = vscode.window.activeTextEditor;
   if (currentEditor) {
-    return Path.dirname(currentEditor.document.uri.path);
+    try {
+      // If the uri does not exist, it raises an exception.
+      await vscode.workspace.fs.stat(currentEditor.document.uri);
+      return Path.dirname(currentEditor.document.uri.path);
+    } catch {
+      // Ignore the error from fs.stat and return pickWorkspace();
+    }
   }
-
   return pickWorkspace();
 }
 
