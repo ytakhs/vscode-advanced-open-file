@@ -9,7 +9,7 @@
     "url": "https://github.com/jit-y/vscode-advanced-open-file"
   },
   "engines": {
-    "vscode": "^1.50.0"
+    "vscode": "^1.79.0"
   },
   "categories": [
     "Other"
