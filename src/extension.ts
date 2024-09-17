@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import * as Path from "path";
 import * as vscode from "vscode";
 import { commands, ExtensionContext, WorkspaceFolder, Uri } from "vscode";
