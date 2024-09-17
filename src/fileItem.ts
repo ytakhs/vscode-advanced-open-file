@@ -26,7 +26,7 @@ export class FileItem implements QuickPickItem {
 }
 
 export async function createFileItems(
-  pathname: string
+  pathname: string,
 ): Promise<ReadonlyArray<FileItem>> {
   let directory = pathname;
   let fragment = "";
@@ -55,7 +55,7 @@ export async function createFileItems(
       const fileType = await vscode.workspace.fs.stat(uri);
 
       return new FileItem(absolutePath, fileType.type);
-    })
+    }),
   );
 
   // Group directories first if desired

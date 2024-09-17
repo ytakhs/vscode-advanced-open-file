@@ -31,7 +31,7 @@ async function pathToCurrentWorkspace(): Promise<string> {
   const currentEditor = vscode.window.activeTextEditor;
   if (currentEditor) {
     const folder = vscode.workspace.getWorkspaceFolder(
-      currentEditor.document.uri
+      currentEditor.document.uri,
     );
     if (folder === undefined) {
       throw new Error("No workspace exists");
@@ -61,13 +61,13 @@ async function advancedOpenWorkspaceFile(): Promise<void> {
 
 export function activate(context: ExtensionContext) {
   context.subscriptions.push(
-    commands.registerCommand("extension.advancedOpenFile", advancedOpenFile)
+    commands.registerCommand("extension.advancedOpenFile", advancedOpenFile),
   );
   context.subscriptions.push(
     commands.registerCommand(
       "extension.advancedOpenWorkspaceFile",
-      advancedOpenWorkspaceFile
-    )
+      advancedOpenWorkspaceFile,
+    ),
   );
 }
 

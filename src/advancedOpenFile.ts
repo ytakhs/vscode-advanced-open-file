@@ -77,7 +77,7 @@ export class AdvancedOpenFile {
     const parts = path.split(Path.sep);
     const fragment = parts[parts.length - 1];
     const directory = Uri.file(
-      path.substring(0, path.length - fragment.length)
+      path.substring(0, path.length - fragment.length),
     );
 
     vscode.workspace.fs.createDirectory(directory).then(() => {

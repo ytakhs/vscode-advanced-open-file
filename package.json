@@ -53,9 +53,9 @@
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "test": "yarn run compile && node ./out/test/runTest.js",
-    "fmt": "prettier --write 'src/**/*.ts'",
+    "fmt": "biome format --write ./src",
+    "fmt-check": "biome format ./src",
     "lint": "eslint -c .eslintrc.json --ext .ts src",
-    "prettier-check": "prettier --check 'src/**/*.ts'",
     "deploy": "vsce publish --yarn"
   },
   "lint-staged": {
