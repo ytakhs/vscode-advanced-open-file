@@ -48,7 +48,7 @@
     }
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
