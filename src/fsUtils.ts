@@ -14,13 +14,7 @@ export const isUriExists = async (uri: Uri): Promise<boolean> => {
       return false;
     }
 
-    if (err.code === "FileNotFound") {
-      console.debug(err.message);
-
-      return false;
-    }
-
-    window.showErrorMessage(err.message);
+    console.debug(err.message, err.code);
 
     return false;
   }
