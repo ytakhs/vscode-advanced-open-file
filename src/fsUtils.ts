@@ -1,6 +1,6 @@
 import { FileSystemError, window, workspace, type Uri } from "vscode";
 
-export const isFileExists = async (uri: Uri): Promise<boolean> => {
+export const isUriExists = async (uri: Uri): Promise<boolean> => {
   try {
     await workspace.fs.stat(uri);
 
