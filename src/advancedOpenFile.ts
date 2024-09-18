@@ -1,8 +1,8 @@
-import * as os from "os";
-import * as Path from "path";
+import * as os from "node:os";
+import * as Path from "node:path";
 import * as vscode from "vscode";
-import { FileType, QuickPick, Uri } from "vscode";
-import { FileItem, createFileItems } from "./fileItem";
+import { FileType, type QuickPick, Uri } from "vscode";
+import { type FileItem, createFileItems } from "./fileItem";
 
 export class AdvancedOpenFile {
   private currentPath: Uri;
@@ -77,7 +77,7 @@ export class AdvancedOpenFile {
     const parts = path.split(Path.sep);
     const fragment = parts[parts.length - 1];
     const directory = Uri.file(
-      path.substring(0, path.length - fragment.length)
+      path.substring(0, path.length - fragment.length),
     );
 
     vscode.workspace.fs.createDirectory(directory).then(() => {

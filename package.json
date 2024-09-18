@@ -48,35 +48,30 @@
     }
   },
   "scripts": {
-    "prepare": "husky install",
+    "prepare": "husky",
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
     "test": "yarn run compile && node ./out/test/runTest.js",
-    "fmt": "prettier --write 'src/**/*.ts'",
+    "fmt": "biome format --write ./src",
+    "fmt-check": "biome format ./src",
     "lint": "eslint -c .eslintrc.json --ext .ts src",
-    "prettier-check": "prettier --check 'src/**/*.ts'",
     "deploy": "vsce publish --yarn"
   },
   "lint-staged": {
     "*.{ts,json}": "prettier --write"
   },
   "devDependencies": {
-    "@types/glob": "^8.0.0",
-    "@types/mocha": "^10.0.0",
-    "@types/node": "^12.12.11",
+    "@biomejs/biome": "1.9.1",
+    "@types/mocha": "10.0.8",
+    "@types/node": "20.14.8",
     "@types/vscode": "^1.79.1",
-    "@typescript-eslint/eslint-plugin": "^5.44.0",
-    "@typescript-eslint/parser": "^5.44.0",
-    "eslint": "^8.28.0",
-    "eslint-config-prettier": "^8.5.0",
-    "glob": "^8.0.3",
-    "husky": "^8.0.2",
-    "lint-staged": "^13.0.4",
-    "mocha": "^10.1.0",
-    "prettier": "^2.8.0",
+    "@vscode/vsce": "3.1.0",
+    "glob": "11.0.0",
+    "husky": "9.1.6",
+    "lint-staged": "15.2.10",
+    "mocha": "10.7.3",
     "typescript": "^4.9.3",
-    "vsce": "^2.14.0",
-    "vscode-test": "^1.6.1"
+    "vscode-test": "1.6.1"
   }
 }
