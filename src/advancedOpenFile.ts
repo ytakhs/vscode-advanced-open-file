@@ -1,6 +1,6 @@
-import * as os from "node:os";
-import * as Path from "node:path";
-import * as vscode from "vscode";
+import { platform } from "node:os";
+import { sep as pathSep } from "node:path";
+import { window, workspace } from "vscode";
 import { FileType, type QuickPick, Uri } from "vscode";
 import { type FileItem, createFileItems } from "./fileItem";
 
@@ -21,7 +21,7 @@ export class AdvancedOpenFile {
   }
 
   initPicker(): QuickPick<FileItem> {
-    const picker: QuickPick<FileItem> = vscode.window.createQuickPick();
+    const picker: QuickPick<FileItem> = window.createQuickPick();
     picker.onDidChangeValue(this.onDidChangeValue.bind(this));
     picker.onDidAccept(this.onDidAccept.bind(this));
     picker.onDidHide(this.onDidHide.bind(this));
@@ -53,10 +53,10 @@ export class AdvancedOpenFile {
         this.openFile();
       } else {
         const fsRoot =
-          os.platform() === "win32" ? process.cwd().split(Path.sep)[0] : "/";
+          platform() === "win32" ? process.cwd().split(pathSep)[0] : "/";
         const path =
           pickedItem.absolutePath +
-          (pickedItem.absolutePath === fsRoot ? "" : Path.sep);
+          (pickedItem.absolutePath === fsRoot ? "" : pathSep);
         this.currentPath = Uri.file(path);
         this.pick();
       }
@@ -74,24 +74,24 @@ export class AdvancedOpenFile {
     this.dispose();
 
     const path = this.currentPath.fsPath;
-    const parts = path.split(Path.sep);
+    const parts = path.split(pathSep);
     const fragment = parts[parts.length - 1];
     const directory = Uri.file(
       path.substring(0, path.length - fragment.length),
     );
 
-    vscode.workspace.fs.createDirectory(directory).then(() => {
+    workspace.fs.createDirectory(directory).then(() => {
       const uri = Uri.file(path);
       const content = new Uint8Array(0);
-      vscode.workspace.fs.writeFile(uri, content).then(() => this.openFile());
+      workspace.fs.writeFile(uri, content).then(() => this.openFile());
     });
   }
 
   openFile() {
     this.dispose();
 
-    vscode.workspace.openTextDocument(this.currentPath).then((document) => {
-      vscode.window.showTextDocument(document);
+    workspace.openTextDocument(this.currentPath).then((document) => {
+      window.showTextDocument(document);
     });
   }
 }

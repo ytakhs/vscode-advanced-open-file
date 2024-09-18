@@ -1,5 +1,5 @@
-import * as Path from "node:path";
-import * as vscode from "vscode";
+import { dirname, sep as pathSep } from "node:path";
+import { window, workspace } from "vscode";
 import {
   commands,
   type ExtensionContext,
@@ -10,7 +10,7 @@ import { AdvancedOpenFile } from "./advancedOpenFile";
 
 async function pickWorkspace(): Promise<string> {
   const targetWorkspaceFolder: WorkspaceFolder | undefined =
-    await vscode.window.showWorkspaceFolderPick();
+    await window.showWorkspaceFolderPick();
   if (targetWorkspaceFolder === undefined) {
     throw new Error("No workspace is opened.");
   }
@@ -19,12 +19,12 @@ async function pickWorkspace(): Promise<string> {
 }
 
 async function pathToCurrentDirectory(): Promise<string> {
-  const currentEditor = vscode.window.activeTextEditor;
+  const currentEditor = window.activeTextEditor;
   if (currentEditor) {
     try {
       // If the uri does not exist, it raises an exception.
-      await vscode.workspace.fs.stat(currentEditor.document.uri);
-      return Path.dirname(currentEditor.document.uri.path);
+      await workspace.fs.stat(currentEditor.document.uri);
+      return dirname(currentEditor.document.uri.path);
     } catch {
       // Ignore the error from fs.stat and return pickWorkspace();
     }
@@ -33,11 +33,9 @@ async function pathToCurrentDirectory(): Promise<string> {
 }
 
 async function pathToCurrentWorkspace(): Promise<string> {
-  const currentEditor = vscode.window.activeTextEditor;
+  const currentEditor = window.activeTextEditor;
   if (currentEditor) {
-    const folder = vscode.workspace.getWorkspaceFolder(
-      currentEditor.document.uri,
-    );
+    const folder = workspace.getWorkspaceFolder(currentEditor.document.uri);
     if (folder === undefined) {
       throw new Error("No workspace exists");
     }
@@ -50,7 +48,7 @@ async function pathToCurrentWorkspace(): Promise<string> {
 
 async function advancedOpenFile(): Promise<void> {
   let defaultDir = await pathToCurrentDirectory();
-  defaultDir += Path.sep;
+  defaultDir += pathSep;
 
   const f = new AdvancedOpenFile(Uri.file(defaultDir));
   f.pick();
@@ -58,7 +56,7 @@ async function advancedOpenFile(): Promise<void> {
 
 async function advancedOpenWorkspaceFile(): Promise<void> {
   let defaultDir = await pathToCurrentWorkspace();
-  defaultDir += Path.sep;
+  defaultDir += pathSep;
 
   const f = new AdvancedOpenFile(Uri.file(defaultDir));
   f.pick();

@@ -1,4 +1,4 @@
-import * as path from "node:path";
+import { basename, dirname, sep as pathSep, join } from "node:path";
 import * as os from "node:os";
 import * as vscode from "vscode";
 import { FileType, Uri, type QuickPickItem } from "vscode";
@@ -19,7 +19,7 @@ export class FileItem implements QuickPickItem {
 
   constructor(absolutePath: string, filetype: FileType, label?: string) {
     this.absolutePath = absolutePath;
-    this.label = `${icons[filetype]} ${label || path.basename(absolutePath)}`;
+    this.label = `${icons[filetype]} ${label || basename(absolutePath)}`;
     this.alwaysShow = true;
     this.filetype = filetype;
   }
@@ -31,9 +31,9 @@ export async function createFileItems(
   let directory = pathname;
   let fragment = "";
 
-  if (!pathname.endsWith(path.sep)) {
-    directory = path.dirname(pathname);
-    fragment = path.basename(pathname);
+  if (!pathname.endsWith(pathSep)) {
+    directory = dirname(pathname);
+    fragment = basename(pathname);
   }
 
   const uri = Uri.file(directory);
@@ -50,7 +50,7 @@ export async function createFileItems(
   const filePickItems = await Promise.all(
     matchedFiles.map(async (fileArr) => {
       const f = fileArr[0];
-      const absolutePath = path.join(directory, f);
+      const absolutePath = join(directory, f);
       const uri = Uri.file(absolutePath);
       const fileType = await vscode.workspace.fs.stat(uri);
 
@@ -84,9 +84,9 @@ export async function createFileItems(
   }
 
   const fsRoot =
-    os.platform() === "win32" ? process.cwd().split(path.sep)[0] : "/";
+    os.platform() === "win32" ? process.cwd().split(pathSep)[0] : "/";
   if (!fragment && directory !== fsRoot) {
-    const parent = path.dirname(directory);
+    const parent = dirname(directory);
     filePickItems.unshift(new FileItem(parent, FileType.Directory, ".."));
   }
 
