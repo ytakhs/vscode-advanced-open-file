@@ -1,5 +1,6 @@
 import { resolve } from "node:path";
 import { glob } from "glob";
+import * as Mocha from "mocha";
 
 export function run(): Promise<void> {
   const mocha = new Mocha({
