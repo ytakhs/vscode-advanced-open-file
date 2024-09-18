@@ -1,7 +1,7 @@
-import * as path from "path";
-import * as os from "os";
+import * as path from "node:path";
+import * as os from "node:os";
 import * as vscode from "vscode";
-import { FileType, Uri, QuickPickItem } from "vscode";
+import { FileType, Uri, type QuickPickItem } from "vscode";
 
 const icons = {
   [FileType.File]: "$(file)",
@@ -70,7 +70,9 @@ export async function createFileItems(
         fileB.filetype !== FileType.Directory
       ) {
         return -1;
-      } else if (
+      }
+
+      if (
         fileA.filetype !== FileType.Directory &&
         fileB.filetype === FileType.Directory
       ) {

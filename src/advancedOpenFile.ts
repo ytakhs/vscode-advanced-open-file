@@ -1,8 +1,8 @@
-import * as os from "os";
-import * as Path from "path";
+import * as os from "node:os";
+import * as Path from "node:path";
 import * as vscode from "vscode";
-import { FileType, QuickPick, Uri } from "vscode";
-import { FileItem, createFileItems } from "./fileItem";
+import { FileType, type QuickPick, Uri } from "vscode";
+import { type FileItem, createFileItems } from "./fileItem";
 
 export class AdvancedOpenFile {
   private currentPath: Uri;

@@ -1,6 +1,11 @@
-import * as Path from "path";
+import * as Path from "node:path";
 import * as vscode from "vscode";
-import { commands, ExtensionContext, WorkspaceFolder, Uri } from "vscode";
+import {
+  commands,
+  type ExtensionContext,
+  type WorkspaceFolder,
+  Uri,
+} from "vscode";
 import { AdvancedOpenFile } from "./advancedOpenFile";
 
 async function pickWorkspace(): Promise<string> {
