@@ -33,6 +33,10 @@ export class AdvancedOpenFile {
     this.picker.show();
   }
 
+  appendValue(v: string) {
+    this.picker.value = this.picker.value + v;
+  }
+
   dispose() {
     this.picker.dispose();
   }

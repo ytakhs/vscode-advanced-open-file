@@ -52,7 +52,7 @@
     "vscode:prepublish": "yarn run compile",
     "compile": "tsc -p ./",
     "watch": "tsc -watch -p ./",
-    "test": "yarn run compile && node ./out/test/runTest.js",
+    "test": "vscode-test",
     "fmt": "biome format --write ./src",
     "fmt-check": "biome format ./src",
     "lint": "eslint -c .eslintrc.json --ext .ts src",
@@ -63,15 +63,14 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.1",
-    "@types/mocha": "10.0.8",
     "@types/node": "20.14.8",
     "@types/vscode": "^1.79.1",
+    "@vscode/test-cli": "0.0.10",
+    "@vscode/test-electron": "2.4.1",
     "@vscode/vsce": "3.1.0",
     "glob": "11.0.0",
     "husky": "9.1.6",
     "lint-staged": "15.2.10",
-    "mocha": "10.7.3",
-    "typescript": "^4.9.3",
-    "vscode-test": "1.6.1"
+    "typescript": "^4.9.3"
   }
 }
