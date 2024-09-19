@@ -2,6 +2,7 @@ import { basename, dirname, sep as pathSep, join } from "node:path";
 import * as os from "node:os";
 import * as vscode from "vscode";
 import { FileType, Uri, type QuickPickItem } from "vscode";
+import { isUriExists } from "./fsUtils";
 
 const icons = {
   [FileType.File]: "$(file)",
@@ -37,7 +38,13 @@ export async function createFileItems(
   }
 
   const uri = Uri.file(directory);
-  const files = await vscode.workspace.fs.readDirectory(uri);
+  let files: [string, FileType][];
+  if (await isUriExists(uri)) {
+    files = await vscode.workspace.fs.readDirectory(uri);
+  } else {
+    files = [];
+  }
+
   const matchedFiles = files.filter((fileArr) => {
     const f = fileArr[0];
     if (fragment.toLowerCase() === fragment) {

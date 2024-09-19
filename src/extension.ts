@@ -7,6 +7,7 @@ import {
   Uri,
 } from "vscode";
 import { AdvancedOpenFile } from "./advancedOpenFile";
+import { isFileScheme, isUriExists } from "./fsUtils";
 
 async function pickWorkspace(): Promise<string> {
   const targetWorkspaceFolder: WorkspaceFolder | undefined =
@@ -21,14 +22,11 @@ async function pickWorkspace(): Promise<string> {
 async function pathToCurrentDirectory(): Promise<string> {
   const currentEditor = window.activeTextEditor;
   if (currentEditor) {
-    try {
-      // If the uri does not exist, it raises an exception.
-      await workspace.fs.stat(currentEditor.document.uri);
+    if (isFileScheme(currentEditor.document.uri)) {
       return dirname(currentEditor.document.uri.path);
-    } catch {
-      // Ignore the error from fs.stat and return pickWorkspace();
     }
   }
+
   return pickWorkspace();
 }
 
