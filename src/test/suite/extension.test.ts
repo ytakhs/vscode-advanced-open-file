@@ -1,4 +1,3 @@
-import { strictEqual } from "node:assert";
 import { commands, Uri, window, workspace } from "vscode";
 import { AdvancedOpenFile } from "../../advancedOpenFile";
 import assert = require("node:assert");
