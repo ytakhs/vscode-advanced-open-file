@@ -7,7 +7,7 @@ import {
   Uri,
 } from "vscode";
 import { AdvancedOpenFile } from "./advancedOpenFile";
-import { isFileScheme, isUriExists } from "./fsUtils";
+import { isFileScheme } from "./fsUtils";
 
 async function pickWorkspace(): Promise<string> {
   const targetWorkspaceFolder: WorkspaceFolder | undefined =
