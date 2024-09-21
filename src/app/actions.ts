@@ -4,12 +4,10 @@ import type { Options } from "./options";
 import type { State } from "./state";
 
 export type Actions = {
-  pick: () => Promise<void>;
+  pick: (uri: Uri) => Promise<void>;
   getSelectedItem: () => FileItem | undefined;
-  getCurrentValue: () => string;
-  getCurrentUri: () => Uri;
-  setUri: (uri: Uri) => void;
-  joinUri: (...pathSegments: string[]) => void;
+  getValue: () => Uri;
+  setValue: (uri: Uri) => void;
   setItems: (items: ReadonlyArray<FileItem>) => void;
 };
 
@@ -22,36 +20,24 @@ export const initActions = (state: State, options: Options): Actions => {
   return {
     pick: initPick({ state, options }),
     getSelectedItem: () => state.picker.selectedItems[0],
-    getCurrentValue: () => state.picker.value,
-    getCurrentUri: () => state.currentUri,
-    setUri: initSetUri({ state, options }),
-    joinUri: initJoinUri({ state, options }),
+    getValue: () => Uri.file(state.picker.value),
+    setValue: initSetValue({ state, options }),
     setItems: (items: ReadonlyArray<FileItem>) => {
       state.picker.items = items;
     },
   };
 };
 
-const initPick = ({ state: { picker, currentUri } }: ActionParams) => {
-  return async () => {
+const initPick = ({ state: { picker } }: ActionParams) => {
+  return async (uri: Uri) => {
     picker.show();
-    picker.value = currentUri.fsPath;
-    picker.items = await createFileItems(currentUri.fsPath);
+    picker.value = uri.fsPath;
+    picker.items = await createFileItems(uri.fsPath);
   };
 };
 
-const initSetUri = ({ state }: ActionParams) => {
+const initSetValue = ({ state }: ActionParams) => {
   return (uri: Uri) => {
     state.picker.value = uri.fsPath;
-    state.currentUri = uri;
-  };
-};
-
-const initJoinUri = ({ state }: ActionParams) => {
-  return (...pathSegments: string[]) => {
-    const uri = Uri.joinPath(state.currentUri, ...pathSegments);
-
-    state.picker.value = uri.fsPath;
-    state.currentUri = uri;
   };
 };

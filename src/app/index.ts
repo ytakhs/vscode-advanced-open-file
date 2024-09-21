@@ -1,4 +1,4 @@
-import { window, type Disposable, type Uri } from "vscode";
+import { window, type Disposable } from "vscode";
 import type { FileItem } from "../fileItem";
 import { initActions, type Actions } from "./actions";
 import { initState } from "./state";
@@ -10,10 +10,10 @@ export type App = {
   actions: Actions;
 };
 
-export const initApp = ({ currentUri }: { currentUri: Uri }): App => {
+export const initApp = (): App => {
   const disposables: Disposable[] = [];
   const picker = window.createQuickPick<FileItem>();
-  const state = initState({ currentUri });
+  const state = initState();
   const options = initOptions();
   const actions = initActions(state, options);
 
