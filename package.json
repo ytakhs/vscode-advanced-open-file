@@ -16,7 +16,8 @@
   ],
   "activationEvents": [
     "onCommand:extension.advancedOpenFile",
-    "onCommand:extension.advancedOpenWorkspaceFile"
+    "onCommand:extension.advancedOpenWorkspaceFile",
+    "onCommand:vscode-advanced-open-file.pickFromActiveDirectory"
   ],
   "main": "./out/extension",
   "contributes": {
@@ -28,11 +29,15 @@
       {
         "command": "extension.advancedOpenWorkspaceFile",
         "title": "Advanced Open File: from active workspace"
+      },
+      {
+        "command": "vscode-advanced-open-file.pickFromActiveDirectory",
+        "title": "Advanced Open File: from active directory"
       }
     ],
     "keybindings": [
       {
-        "command": "extension.advancedOpenFile",
+        "command": "vscode-advanced-open-file.pickFromActiveDirectory",
         "key": "ctrl+x ctrl+f"
       }
     ],

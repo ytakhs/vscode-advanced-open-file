@@ -29,6 +29,16 @@ export const initApp = (): App => {
   return app;
 };
 
+export const ensureApp = (app: App | undefined): App | never => {
+  if (app === undefined) {
+    window.showErrorMessage("App is not initialized.");
+
+    throw new Error("App is not initialized.");
+  }
+
+  return app;
+};
+
 export const deinitApp = (app: App) => {
   for (const d of app.disposables) {
     d.dispose();

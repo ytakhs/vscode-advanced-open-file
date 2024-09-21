@@ -7,7 +7,7 @@
     "sourceMap": true,
     "rootDir": "src",
     "strict": true,
-    "noImplicitAny": true,
+    // "noImplicitAny": true,
     "exactOptionalPropertyTypes": true,
     "noFallthroughCasesInSwitch": true,
     "noImplicitOverride": true,
