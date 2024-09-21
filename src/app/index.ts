@@ -3,6 +3,7 @@ import type { FileItem } from "../fileItem";
 import { initActions, type Actions } from "./actions";
 import { initState } from "./state";
 import { initOptions } from "./options";
+import { initOnDidAccept, initOnDidChangeValue } from "./handlers";
 
 export type App = {
   disposables: Array<Disposable>;
@@ -22,14 +23,11 @@ export const initApp = ({ currentUri }: { currentUri: Uri }): App => {
   };
 
   disposables.push(picker);
-  disposables.push(picker.onDidChangeValue(() => {}));
-  disposables.push(picker.onDidAccept(() => {}));
-  disposables.push(picker.onDidHide(() => {}));
+  disposables.push(picker.onDidChangeValue(initOnDidChangeValue(app)));
+  disposables.push(picker.onDidAccept(initOnDidAccept(app)));
 
   return app;
 };
-
-export const subscribe = (app: App) => {};
 
 export const deinitApp = (app: App) => {
   for (const d of app.disposables) {

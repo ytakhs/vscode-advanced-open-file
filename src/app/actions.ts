@@ -5,7 +5,9 @@ import type { State } from "./state";
 
 export type Actions = {
   pick: () => Promise<void>;
-  getUri: () => Uri;
+  getSelectedItem: () => FileItem | undefined;
+  getCurrentValue: () => string;
+  getCurrentUri: () => Uri;
   setUri: (uri: Uri) => void;
   joinUri: (...pathSegments: string[]) => void;
   setItems: (items: ReadonlyArray<FileItem>) => void;
@@ -19,7 +21,9 @@ type ActionParams = {
 export const initActions = (state: State, options: Options): Actions => {
   return {
     pick: initPick({ state, options }),
-    getUri: () => state.currentUri,
+    getSelectedItem: () => state.picker.selectedItems[0],
+    getCurrentValue: () => state.picker.value,
+    getCurrentUri: () => state.currentUri,
     setUri: initSetUri({ state, options }),
     joinUri: initJoinUri({ state, options }),
     setItems: (items: ReadonlyArray<FileItem>) => {
