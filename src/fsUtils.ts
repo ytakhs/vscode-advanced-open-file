@@ -1,4 +1,5 @@
-import { FileSystemError, window, workspace, type Uri } from "vscode";
+import { dirname } from "node:path";
+import { FileSystemError, Uri, window, workspace } from "vscode";
 
 export const isFileScheme = (uri: Uri): boolean => {
   console.debug(uri.scheme);
@@ -32,4 +33,20 @@ export const isUriExists = async (uri: Uri): Promise<boolean> => {
 
     return false;
   }
+};
+
+export const createFileWithDir = async (
+  uri: Uri,
+  content: Uint8Array,
+): Promise<void> => {
+  const directory = Uri.file(dirname(uri.fsPath));
+
+  await workspace.fs.createDirectory(directory);
+
+  await workspace.fs.writeFile(uri, content);
+};
+
+export const openFile = async (uri: Uri): Promise<void> => {
+  const doc = await workspace.openTextDocument(uri);
+  await window.showTextDocument(doc);
 };

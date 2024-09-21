@@ -29,6 +29,8 @@ export const initApp = ({ currentUri }: { currentUri: Uri }): App => {
   return app;
 };
 
+export const subscribe = (app: App) => {};
+
 export const deinitApp = (app: App) => {
   for (const d of app.disposables) {
     d.dispose();
