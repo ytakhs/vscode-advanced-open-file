@@ -1,4 +1,4 @@
-import { dirname } from "node:path";
+import { dirname, sep } from "node:path";
 import { FileSystemError, Uri, window, workspace } from "vscode";
 
 export const isFileScheme = (uri: Uri): boolean => {
@@ -49,4 +49,8 @@ export const createFileWithDir = async (
 export const openFile = async (uri: Uri): Promise<void> => {
   const doc = await workspace.openTextDocument(uri);
   await window.showTextDocument(doc);
+};
+
+export const appendSepToUri = (uri: Uri): Uri => {
+  return uri.with({ path: `${uri.path}${sep}` });
 };

@@ -1,6 +1,6 @@
-import { dirname, sep } from "node:path";
+import { dirname } from "node:path";
 import { Uri, window } from "vscode";
-import { isFileScheme } from "../fsUtils";
+import { appendSepToUri, isFileScheme } from "../fsUtils";
 import type { App } from "../app";
 
 export const initPickFromActiveDir = (app: App) => {
@@ -13,7 +13,7 @@ export const initPickFromActiveDir = (app: App) => {
 
     const { pick } = app.actions;
 
-    pick(currentDir.with({ path: `${currentDir.path}${sep}` }));
+    pick(appendSepToUri(currentDir));
   };
 };
 

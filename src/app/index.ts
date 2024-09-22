@@ -12,8 +12,8 @@ export type App = {
 
 export const initApp = (): App => {
   const disposables: Disposable[] = [];
-  const picker = window.createQuickPick<FileItem>();
   const state = initState();
+  const picker = state.picker;
   const options = initOptions();
   const actions = initActions(state, options);
 

@@ -1,8 +1,9 @@
-import { dirname } from "node:path";
+import { sep } from "node:path";
 import { FileType, Uri } from "vscode";
 import type { App } from ".";
 import { createFileItems } from "../fileItem";
 import { createFileWithDir, openFile } from "../fsUtils";
+import { platform } from "node:os";
 
 export const initOnDidChangeValue = (app: App) => {
   return (value: string) => {
@@ -19,7 +20,9 @@ export const initOnDidAccept = (app: App) => {
     if (selectedItem === undefined) {
       const newUri = getValue();
 
-      createFileWithDir(newUri, new Uint8Array(0)).then(() => setValue(newUri));
+      createFileWithDir(newUri, new Uint8Array(0))
+        .then(() => setValue(newUri))
+        .then(() => openFile(newUri));
 
       return;
     }
@@ -33,7 +36,12 @@ export const initOnDidAccept = (app: App) => {
     }
 
     // continue picking if it's a directory
-    const uri = Uri.file(dirname(selectedItem.absolutePath));
+    const fsRoot = platform() === "win32" ? process.cwd().split(sep)[0] : "/";
+    const newFsPath =
+      selectedItem.absolutePath +
+      (selectedItem.absolutePath === fsRoot ? "" : sep);
+
+    const uri = Uri.file(newFsPath);
     setValue(uri);
     pick(uri);
   };
