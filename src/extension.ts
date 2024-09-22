@@ -7,7 +7,9 @@ import {
   Uri,
 } from "vscode";
 import { AdvancedOpenFile } from "./advancedOpenFile";
-import { isFileScheme, isUriExists } from "./fsUtils";
+import { isFileScheme } from "./fsUtils";
+import { initPickCommand } from "./commands";
+import { type App, deinitApp, ensureApp, initApp } from "./app";
 
 async function pickWorkspace(): Promise<string> {
   const targetWorkspaceFolder: WorkspaceFolder | undefined =
@@ -60,7 +62,12 @@ async function advancedOpenWorkspaceFile(): Promise<void> {
   f.pick();
 }
 
+let app: App | undefined = undefined;
+
 export function activate(context: ExtensionContext) {
+  app = initApp();
+  app = ensureApp(app);
+
   context.subscriptions.push(
     commands.registerCommand("extension.advancedOpenFile", advancedOpenFile),
   );
@@ -70,7 +77,23 @@ export function activate(context: ExtensionContext) {
       advancedOpenWorkspaceFile,
     ),
   );
+  context.subscriptions.push(
+    commands.registerCommand(
+      "vscode-advanced-open-file.pickFromActiveDirectory",
+      initPickCommand(app, false),
+    ),
+  );
+  context.subscriptions.push(
+    commands.registerCommand(
+      "vscode-advanced-open-file.pickFromWorkspaceRoot",
+      initPickCommand(app, true),
+    ),
+  );
 }
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export function deactivate() {}
+export function deactivate() {
+  if (app !== undefined) {
+    deinitApp(app);
+    app = undefined;
+  }
+}
