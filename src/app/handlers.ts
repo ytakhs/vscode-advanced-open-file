@@ -1,7 +1,7 @@
 import { sep } from "node:path";
 import { FileType, Uri } from "vscode";
 import type { App } from ".";
-import { createFileItems } from "../fileItem";
+import { createFileItems } from "./fileItem";
 import { createFileWithDir, openFile } from "../fsUtils";
 import { platform } from "node:os";
 

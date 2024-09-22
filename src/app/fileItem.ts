@@ -2,7 +2,7 @@ import { basename, dirname, sep as pathSep, join } from "node:path";
 import * as os from "node:os";
 import * as vscode from "vscode";
 import { FileType, Uri, type QuickPickItem } from "vscode";
-import { isUriExists } from "./fsUtils";
+import { isUriExists } from "../fsUtils";
 
 const icons = {
   [FileType.File]: "$(file)",
