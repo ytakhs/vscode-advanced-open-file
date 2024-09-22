@@ -4,7 +4,7 @@ import type { Options } from "./options";
 import type { State } from "./state";
 
 export type Actions = {
-  pick: (uri: Uri) => Promise<void>;
+  showPicker: (uri: Uri) => Promise<void>;
   getSelectedItem: () => FileItem | undefined;
   getValue: () => Uri;
   setValue: (uri: Uri) => void;
@@ -18,7 +18,7 @@ type ActionParams = {
 
 export const initActions = (state: State, options: Options): Actions => {
   return {
-    pick: initPick({ state, options }),
+    showPicker: initShowPicker({ state, options }),
     getSelectedItem: () => state.picker.selectedItems[0],
     getValue: () => Uri.file(state.picker.value),
     setValue: initSetValue({ state, options }),
@@ -28,7 +28,7 @@ export const initActions = (state: State, options: Options): Actions => {
   };
 };
 
-const initPick = ({ state: { picker } }: ActionParams) => {
+const initShowPicker = ({ state: { picker } }: ActionParams) => {
   return async (uri: Uri) => {
     picker.show();
     picker.value = uri.fsPath;
