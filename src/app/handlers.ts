@@ -20,7 +20,7 @@ export const initOnHideHandler = (app: App) => {
 
 export const initOnDidAcceptHandler = (app: App) => {
   return () => {
-    const { getValue, getSelectedItem, setValue, pick } = app.actions;
+    const { getValue, getSelectedItem, setValue, showPicker } = app.actions;
     const selectedItem = getSelectedItem();
 
     // no existing file or directory, so create a new file.
@@ -50,6 +50,6 @@ export const initOnDidAcceptHandler = (app: App) => {
 
     const uri = Uri.file(newFsPath);
     setValue(uri);
-    pick(uri);
+    showPicker(uri);
   };
 };

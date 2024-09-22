@@ -9,7 +9,7 @@ const testWorkspace = Uri.file(path.resolve(".test-workspace"));
 suite("AdvancedOpenFile", () => {
   test("Open a file", async () => {
     const app = initApp();
-    app.actions.pick(testWorkspace);
+    app.actions.showPicker(testWorkspace);
     const v = app.actions.getValue();
     app.actions.setValue(Uri.joinPath(v, "foo.txt"));
     await commands.executeCommand("workbench.action.quickOpenSelectNext");
@@ -26,7 +26,7 @@ suite("AdvancedOpenFile", () => {
     await cleanTestTmpDir();
 
     const app = initApp();
-    app.actions.pick(testWorkspace);
+    app.actions.showPicker(testWorkspace);
     const v = app.actions.getValue();
     app.actions.setValue(Uri.joinPath(v, "tmp", "foo", "bar", "foo.txt"));
 
