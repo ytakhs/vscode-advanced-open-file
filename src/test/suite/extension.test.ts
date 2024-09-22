@@ -1,16 +1,17 @@
+import * as assert from "node:assert";
+import * as path from "node:path";
 import { commands, Uri, window, workspace } from "vscode";
-import { AdvancedOpenFile } from "../../advancedOpenFile";
-import assert = require("node:assert");
-import path = require("node:path");
 import { isUriExists } from "../../fsUtils";
+import { initApp } from "../../app";
 
 const testWorkspace = Uri.file(path.resolve(".test-workspace"));
 
 suite("AdvancedOpenFile", () => {
   test("Open a file", async () => {
-    const aof = new AdvancedOpenFile(testWorkspace);
-    aof.pick();
-    aof.appendValue("/foo.txt");
+    const app = initApp();
+    app.actions.pick(testWorkspace);
+    const v = app.actions.getValue();
+    app.actions.setValue(Uri.joinPath(v, "foo.txt"));
     await commands.executeCommand("workbench.action.quickOpenSelectNext");
     await commands.executeCommand(
       "workbench.action.acceptSelectedQuickOpenItem",
@@ -24,13 +25,11 @@ suite("AdvancedOpenFile", () => {
   test("Create a file with directory", async () => {
     await cleanTestTmpDir();
 
-    const aof = new AdvancedOpenFile(testWorkspace);
+    const app = initApp();
+    app.actions.pick(testWorkspace);
+    const v = app.actions.getValue();
+    app.actions.setValue(Uri.joinPath(v, "tmp", "foo", "bar", "foo.txt"));
 
-    aof.pick();
-
-    aof.appendValue("/tmp/foo/bar/foo.txt");
-
-    await commands.executeCommand("workbench.action.quickOpenSelectNext");
     await commands.executeCommand(
       "workbench.action.acceptSelectedQuickOpenItem",
     );
