@@ -25,6 +25,20 @@ export const initPickCommand = (app: App, fromRoot: boolean) => {
   };
 };
 
+export const initPickCommandWithDeprecation = (
+  app: App,
+  fromRoot: boolean,
+  alternative: string,
+) => {
+  return async () => {
+    window.showWarningMessage(
+      `This command is deprecated. Please use the ${alternative} instead.`,
+    );
+
+    await initPickCommand(app, fromRoot)();
+  };
+};
+
 const getCurrentDir = (): Uri | undefined => {
   const currentEditor = window.activeTextEditor;
   if (currentEditor === undefined) {

@@ -1,5 +1,5 @@
 import { Uri } from "vscode";
-import { createFileItems, type FileItem } from "../fileItem";
+import { createFileItems, type FileItem } from "./fileItem";
 import type { Options } from "./options";
 import type { State } from "./state";
 
