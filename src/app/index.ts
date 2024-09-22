@@ -2,7 +2,11 @@ import { window, type Disposable } from "vscode";
 import { initActions, type Actions } from "./actions";
 import { initState } from "./state";
 import { initOptions } from "./options";
-import { initOnDidAccept, initOnDidChangeValue } from "./handlers";
+import {
+  initOnDidAcceptHandler,
+  initOnDidChangeValueHandler,
+  initOnHideHandler,
+} from "./handlers";
 
 export type App = {
   disposables: Array<Disposable>;
@@ -22,8 +26,9 @@ export const initApp = (): App => {
   };
 
   disposables.push(picker);
-  disposables.push(picker.onDidChangeValue(initOnDidChangeValue(app)));
-  disposables.push(picker.onDidAccept(initOnDidAccept(app)));
+  disposables.push(picker.onDidChangeValue(initOnDidChangeValueHandler(app)));
+  disposables.push(picker.onDidAccept(initOnDidAcceptHandler(app)));
+  disposables.push(picker.onDidHide(initOnHideHandler(app)));
 
   return app;
 };

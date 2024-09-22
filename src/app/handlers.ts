@@ -5,13 +5,20 @@ import { createFileItems } from "../fileItem";
 import { createFileWithDir, openFile } from "../fsUtils";
 import { platform } from "node:os";
 
-export const initOnDidChangeValue = (app: App) => {
+export const initOnDidChangeValueHandler = (app: App) => {
   return (value: string) => {
     createFileItems(value).then(app.actions.setItems);
   };
 };
 
-export const initOnDidAccept = (app: App) => {
+export const initOnHideHandler = (app: App) => {
+  return () => {
+    app.actions.setValue(Uri.file(""));
+    app.actions.setItems([]);
+  };
+};
+
+export const initOnDidAcceptHandler = (app: App) => {
   return () => {
     const { getValue, getSelectedItem, setValue, pick } = app.actions;
     const selectedItem = getSelectedItem();
