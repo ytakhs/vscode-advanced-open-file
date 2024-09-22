@@ -33,6 +33,7 @@ const initShowPicker = ({ state: { picker } }: ActionParams) => {
     picker.show();
     picker.value = uri.fsPath;
     picker.items = await createFileItems(uri.fsPath);
+    picker.selectedItems = [];
   };
 };
 
