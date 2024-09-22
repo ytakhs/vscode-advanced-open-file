@@ -1,5 +1,4 @@
 import { window, type Disposable } from "vscode";
-import type { FileItem } from "../fileItem";
 import { initActions, type Actions } from "./actions";
 import { initState } from "./state";
 import { initOptions } from "./options";
