@@ -1,19 +1,27 @@
 import { dirname } from "node:path";
-import { Uri, window } from "vscode";
+import { Uri, window, workspace } from "vscode";
 import { appendSepToUri, isFileScheme } from "../fsUtils";
 import type { App } from "../app";
 
-export const initPickFromActiveDir = (app: App) => {
+export const initPickCommand = (app: App, fromRoot: boolean) => {
   return async () => {
-    const currentDir = getCurrentDir();
-    if (currentDir === undefined) {
-      window.showErrorMessage("No workspace is opened.");
+    let targetDir = getCurrentDir() || (await pickWorkspaceRootDir());
+    if (targetDir === undefined) {
+      window.showErrorMessage("No workspace is selected.");
       return;
+    }
+
+    if (fromRoot) {
+      targetDir = workspace.getWorkspaceFolder(targetDir)?.uri;
+      if (targetDir === undefined) {
+        window.showErrorMessage("No workspace is selected.");
+        return;
+      }
     }
 
     const { pick } = app.actions;
 
-    pick(appendSepToUri(currentDir));
+    pick(appendSepToUri(targetDir));
   };
 };
 
@@ -30,4 +38,13 @@ const getCurrentDir = (): Uri | undefined => {
   const dir = dirname(currentEditor.document.uri.fsPath);
 
   return Uri.file(dir);
+};
+
+const pickWorkspaceRootDir = async (): Promise<Uri | undefined> => {
+  const targetWorkspaceFolder = await window.showWorkspaceFolderPick();
+  if (targetWorkspaceFolder === undefined) {
+    return undefined;
+  }
+
+  return targetWorkspaceFolder.uri;
 };
