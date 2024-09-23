@@ -5,12 +5,16 @@ export type Options = {
 };
 
 export const initOptions = (): Options => {
-  const groupDirectoriesFirst =
-    workspace
-      .getConfiguration()
-      .get<boolean>("vscode-advanced-open-file.groupDirectoriesFirst") ?? true;
+  const config = workspace.getConfiguration("vscode-advanced-open-file");
 
-  return {
+  const groupDirectoriesFirst =
+    config.get<boolean>("groupDirectoriesFirst") ?? false;
+
+  const options = {
     groupDirectoriesFirst,
   };
+
+  console.debug("Options initialized:", options);
+
+  return options;
 };

@@ -28,6 +28,7 @@ export class FileItem implements QuickPickItem {
 
 export async function createFileItems(
   pathname: string,
+  isGroupDirectoriesFirst: boolean,
 ): Promise<ReadonlyArray<FileItem>> {
   let directory = pathname;
   let fragment = "";
@@ -66,11 +67,7 @@ export async function createFileItems(
   );
 
   // Group directories first if desired
-  if (
-    vscode.workspace
-      .getConfiguration()
-      .get("vscode-advanced-open-file.groupDirectoriesFirst")
-  ) {
+  if (isGroupDirectoriesFirst) {
     filePickItems.sort((fileA, fileB) => {
       if (
         fileA.filetype === FileType.Directory &&

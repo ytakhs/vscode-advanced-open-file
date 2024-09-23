@@ -7,7 +7,9 @@ import { platform } from "node:os";
 
 export const initOnDidChangeValueHandler = (app: App) => {
   return (value: string) => {
-    createFileItems(value).then(app.actions.setItems);
+    createFileItems(value, app.options.groupDirectoriesFirst).then(
+      app.actions.setItems,
+    );
   };
 };
 
@@ -50,6 +52,6 @@ export const initOnDidAcceptHandler = (app: App) => {
 
     const uri = Uri.file(newFsPath);
     setValue(uri);
-    showPicker(uri);
+    showPicker(uri, app.options);
   };
 };
