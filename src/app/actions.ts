@@ -1,10 +1,10 @@
 import { Uri } from "vscode";
-import { createFileItems, type FileItem } from "./fileItem";
-import type { Options } from "./options";
+import { buildFileItems, type FileItem } from "./fileItem";
 import type { State } from "./state";
+import type { Options } from "./options";
 
 export type Actions = {
-  showPicker: (uri: Uri) => Promise<void>;
+  showPicker: (uri: Uri, options: Options) => Promise<void>;
   getSelectedItem: () => FileItem | undefined;
   getValue: () => Uri;
   setValue: (uri: Uri) => void;
@@ -13,15 +13,14 @@ export type Actions = {
 
 type ActionParams = {
   state: State;
-  options: Options;
 };
 
-export const initActions = (state: State, options: Options): Actions => {
+export const initActions = (state: State): Actions => {
   return {
-    showPicker: initShowPicker({ state, options }),
+    showPicker: initShowPicker({ state }),
     getSelectedItem: () => state.picker.selectedItems[0],
     getValue: () => Uri.file(state.picker.value),
-    setValue: initSetValue({ state, options }),
+    setValue: initSetValue({ state }),
     setItems: (items: ReadonlyArray<FileItem>) => {
       state.picker.items = items;
     },
@@ -29,10 +28,13 @@ export const initActions = (state: State, options: Options): Actions => {
 };
 
 const initShowPicker = ({ state: { picker } }: ActionParams) => {
-  return async (uri: Uri) => {
+  return async (uri: Uri, options: Options) => {
     picker.show();
     picker.value = uri.fsPath;
-    picker.items = await createFileItems(uri.fsPath);
+    picker.items = await buildFileItems(
+      uri.fsPath,
+      options.groupDirectoriesFirst,
+    );
     picker.selectedItems = [];
   };
 };

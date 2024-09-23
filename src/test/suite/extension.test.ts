@@ -3,13 +3,14 @@ import * as path from "node:path";
 import { commands, Uri, window, workspace } from "vscode";
 import { isUriExists } from "../../fsUtils";
 import { initApp } from "../../app";
+import { initOptions } from "../../app/options";
 
 const testWorkspace = Uri.file(path.resolve(".test-workspace"));
 
 suite("AdvancedOpenFile", () => {
   test("Open a file", async () => {
     const app = initApp();
-    app.actions.showPicker(testWorkspace);
+    app.actions.showPicker(testWorkspace, initOptions());
     const v = app.actions.getValue();
     app.actions.setValue(Uri.joinPath(v, "foo.txt"));
     await commands.executeCommand("workbench.action.quickOpenSelectNext");
@@ -26,7 +27,7 @@ suite("AdvancedOpenFile", () => {
     await cleanTestTmpDir();
 
     const app = initApp();
-    app.actions.showPicker(testWorkspace);
+    app.actions.showPicker(testWorkspace, initOptions());
     const v = app.actions.getValue();
     app.actions.setValue(Uri.joinPath(v, "tmp", "foo", "bar", "foo.txt"));
 

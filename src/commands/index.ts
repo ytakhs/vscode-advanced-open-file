@@ -21,7 +21,7 @@ export const initPickCommand = (app: App, fromRoot: boolean) => {
 
     const { showPicker } = app.actions;
 
-    showPicker(appendSepToUri(targetDir));
+    showPicker(appendSepToUri(targetDir), app.options);
   };
 };
 

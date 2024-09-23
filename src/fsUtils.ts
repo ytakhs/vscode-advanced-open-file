@@ -2,8 +2,6 @@ import { dirname, sep } from "node:path";
 import { FileSystemError, Uri, window, workspace } from "vscode";
 
 export const isFileScheme = (uri: Uri): boolean => {
-  console.debug(uri.scheme);
-
   return uri.scheme === "file";
 };
 

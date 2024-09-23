@@ -1,7 +1,7 @@
 import { window, type Disposable } from "vscode";
 import { initActions, type Actions } from "./actions";
 import { initState } from "./state";
-import { initOptions } from "./options";
+import { initOptions, type Options } from "./options";
 import {
   initOnDidAcceptHandler,
   initOnDidChangeValueHandler,
@@ -11,6 +11,7 @@ import {
 export type App = {
   disposables: Array<Disposable>;
   actions: Actions;
+  options: Options;
 };
 
 export const initApp = (): App => {
@@ -18,11 +19,12 @@ export const initApp = (): App => {
   const state = initState();
   const picker = state.picker;
   const options = initOptions();
-  const actions = initActions(state, options);
+  const actions = initActions(state);
 
   const app: App = {
     disposables,
     actions,
+    options,
   };
 
   disposables.push(picker);
