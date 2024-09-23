@@ -6,3 +6,9 @@ src/**
 .gitignore
 tsconfig.json
 vsc-extension-quickstart.md
+.test-workspace
+.husky
+.vscode-test.js
+.github
+biome.json
+.node-version
