@@ -1,13 +1,13 @@
 import { sep } from "node:path";
 import { FileType, Uri } from "vscode";
 import type { App } from ".";
-import { createFileItems } from "./fileItem";
+import { buildFileItems } from "./fileItem";
 import { createFileWithDir, openFile } from "../fsUtils";
 import { platform } from "node:os";
 
 export const initOnDidChangeValueHandler = (app: App) => {
   return (value: string) => {
-    createFileItems(value, app.options.groupDirectoriesFirst).then(
+    buildFileItems(value, app.options.groupDirectoriesFirst).then(
       app.actions.setItems,
     );
   };

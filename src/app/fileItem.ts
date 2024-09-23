@@ -26,7 +26,7 @@ export class FileItem implements QuickPickItem {
   }
 }
 
-export async function createFileItems(
+export async function buildFileItems(
   pathname: string,
   isGroupDirectoriesFirst: boolean,
 ): Promise<ReadonlyArray<FileItem>> {
