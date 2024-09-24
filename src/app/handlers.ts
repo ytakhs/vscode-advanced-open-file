@@ -2,8 +2,7 @@ import { sep } from "node:path";
 import { FileType, Uri } from "vscode";
 import type { App } from ".";
 import { buildFileItems } from "./fileItem";
-import { createFileWithDir, openFile } from "../fsUtils";
-import { platform } from "node:os";
+import { createFileWithDir, getFsRoot, openFile } from "../fsUtils";
 
 export const initOnDidChangeValueHandler = (app: App) => {
   return (value: string) => {
@@ -45,7 +44,7 @@ export const initOnDidAcceptHandler = (app: App) => {
     }
 
     // continue picking if it's a directory
-    const fsRoot = platform() === "win32" ? process.cwd().split(sep)[0] : "/";
+    const fsRoot = getFsRoot();
     const newFsPath =
       selectedItem.absolutePath +
       (selectedItem.absolutePath === fsRoot ? "" : sep);

@@ -1,8 +1,6 @@
 import { basename, dirname, sep as pathSep, join } from "node:path";
-import * as os from "node:os";
-import * as vscode from "vscode";
-import { FileType, Uri, type QuickPickItem } from "vscode";
-import { isUriExists } from "../fsUtils";
+import { FileType, Uri, workspace, type QuickPickItem } from "vscode";
+import { getFsRoot, isUriExists } from "../fsUtils";
 
 const icons = {
   [FileType.File]: "$(file)",
@@ -41,7 +39,7 @@ export async function buildFileItems(
   const uri = Uri.file(directory);
   let files: [string, FileType][];
   if (await isUriExists(uri)) {
-    files = await vscode.workspace.fs.readDirectory(uri);
+    files = await workspace.fs.readDirectory(uri);
   } else {
     files = [];
   }
@@ -60,7 +58,7 @@ export async function buildFileItems(
       const f = fileArr[0];
       const absolutePath = join(directory, f);
       const uri = Uri.file(absolutePath);
-      const fileType = await vscode.workspace.fs.stat(uri);
+      const fileType = await workspace.fs.stat(uri);
 
       return new FileItem(absolutePath, fileType.type);
     }),
@@ -87,8 +85,7 @@ export async function buildFileItems(
     });
   }
 
-  const fsRoot =
-    os.platform() === "win32" ? process.cwd().split(pathSep)[0] : "/";
+  const fsRoot = getFsRoot();
   if (!fragment && directory !== fsRoot) {
     const parent = dirname(directory);
     filePickItems.unshift(new FileItem(parent, FileType.Directory, ".."));

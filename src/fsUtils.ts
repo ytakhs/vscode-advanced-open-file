@@ -1,4 +1,5 @@
 import { dirname, sep } from "node:path";
+import { platform } from "node:process";
 import { FileSystemError, Uri, window, workspace } from "vscode";
 
 export const isFileScheme = (uri: Uri): boolean => {
@@ -51,4 +52,8 @@ export const openFile = async (uri: Uri): Promise<void> => {
 
 export const appendSepToUri = (uri: Uri): Uri => {
   return uri.with({ path: `${uri.path}${sep}` });
+};
+
+export const getFsRoot = (): string => {
+  return platform === "win32" ? process.cwd().split(sep)[0] : "/";
 };
