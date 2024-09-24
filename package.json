@@ -75,7 +75,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.2",
     "@types/node": "20.14.8",
-    "@types/vscode": "^1.79.1",
+    "@types/vscode": "^1.93.0",
     "@vscode/test-cli": "0.0.10",
     "@vscode/test-electron": "2.4.1",
     "@vscode/vsce": "3.1.0",
