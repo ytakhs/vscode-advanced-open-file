@@ -1,6 +1,13 @@
 import { dirname, sep } from "node:path";
 import { platform } from "node:process";
-import { FileSystemError, Uri, window, workspace } from "vscode";
+import {
+  FileSystemError,
+  type TextDocument,
+  Uri,
+  window,
+  workspace,
+} from "vscode";
+import { OpenUriError } from "./app/error";
 
 export const isFileScheme = (uri: Uri): boolean => {
   return uri.scheme === "file";
@@ -46,7 +53,17 @@ export const createFileWithDir = async (
 };
 
 export const openFile = async (uri: Uri): Promise<void> => {
-  const doc = await workspace.openTextDocument(uri);
+  let doc: TextDocument;
+
+  try {
+    doc = await workspace.openTextDocument(uri);
+  } catch (e) {
+    const newErr = new OpenUriError(`Failed to open the file: ${uri.path}`);
+    newErr.name = "OpenUriError";
+
+    throw newErr;
+  }
+
   await window.showTextDocument(doc);
 };
 
