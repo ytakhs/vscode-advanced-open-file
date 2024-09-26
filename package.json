@@ -6,7 +6,7 @@
   "publisher": "jit-y",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jit-y/vscode-advanced-open-file"
+    "url": "https://github.com/ytakhs/vscode-advanced-open-file"
   },
   "engines": {
     "vscode": "^1.79.0"
