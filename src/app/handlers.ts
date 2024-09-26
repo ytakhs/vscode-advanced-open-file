@@ -3,6 +3,7 @@ import { FileType, Uri } from "vscode";
 import type { App } from ".";
 import { buildFileItems } from "./fileItem";
 import { createFileWithDir, getFsRoot, openFile } from "../fsUtils";
+import { handleError } from "./error";
 
 export const initOnDidChangeValueHandler = (app: App) => {
   return (value: string) => {
@@ -30,7 +31,8 @@ export const initOnDidAcceptHandler = (app: App) => {
 
       createFileWithDir(newUri, new Uint8Array(0))
         .then(() => setValue(newUri))
-        .then(() => openFile(newUri));
+        .then(() => openFile(newUri))
+        .catch(handleError);
 
       return;
     }
@@ -38,7 +40,9 @@ export const initOnDidAcceptHandler = (app: App) => {
     // open if it's a file
     if ((selectedItem.filetype & FileType.File) > 0) {
       const uri = Uri.file(selectedItem.absolutePath);
-      openFile(uri).then(() => setValue(uri));
+      openFile(uri)
+        .then(() => setValue(uri))
+        .catch(handleError);
 
       return;
     }
