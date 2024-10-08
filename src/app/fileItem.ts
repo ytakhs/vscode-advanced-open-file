@@ -86,7 +86,7 @@ export async function buildFileItems(
   }
 
   const fsRoot = getFsRoot();
-  if (!fragment && directory !== fsRoot) {
+  if (!fragment && directory !== fsRoot && files.length > 0) {
     const parent = dirname(directory);
     filePickItems.unshift(new FileItem(parent, FileType.Directory, ".."));
   }

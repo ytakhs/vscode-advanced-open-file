@@ -1,8 +1,13 @@
 import { sep } from "node:path";
-import { FileType, Uri } from "vscode";
+import { FileType, Uri, window } from "vscode";
 import type { App } from ".";
 import { buildFileItems } from "./fileItem";
-import { createFileWithDir, getFsRoot, openFile } from "../fsUtils";
+import {
+  createFileWithDir,
+  getFileType,
+  getFsRoot,
+  openFile,
+} from "../fsUtils";
 import { handleError } from "./error";
 
 export const initOnDidChangeValueHandler = (app: App) => {
@@ -31,7 +36,16 @@ export const initOnDidAcceptHandler = (app: App) => {
 
       createFileWithDir(newUri, new Uint8Array(0))
         .then(() => setValue(newUri))
-        .then(() => openFile(newUri))
+        .then(() => getFileType(newUri))
+        .then((fileType) => {
+          if (fileType.isFile) {
+            return openFile(newUri);
+          }
+
+          window.showInformationMessage(`created: ${newUri.fsPath}`);
+
+          return;
+        })
         .catch(handleError);
 
       return;

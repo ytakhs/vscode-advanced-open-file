@@ -2,6 +2,7 @@ import { dirname, sep } from "node:path";
 import { platform } from "node:process";
 import {
   FileSystemError,
+  FileType,
   type TextDocument,
   Uri,
   window,
@@ -41,15 +42,35 @@ export const isUriExists = async (uri: Uri): Promise<boolean> => {
   }
 };
 
+export const getFileType = async (uri: Uri) => {
+  const stat = await workspace.fs.stat(uri);
+
+  const isFile = ((FileType.SymbolicLink | FileType.File) & stat.type) > 0;
+  const isDir = ((FileType.SymbolicLink | FileType.Directory) & stat.type) > 0;
+
+  console.log(isFile, isDir);
+  return {
+    isFile,
+    isDir,
+  };
+};
+
 export const createFileWithDir = async (
   uri: Uri,
   content: Uint8Array,
 ): Promise<void> => {
-  const directory = Uri.file(dirname(uri.fsPath));
+  const onlyDir = uri.fsPath.endsWith(sep);
+  if (onlyDir) {
+    await workspace.fs.createDirectory(uri);
 
-  await workspace.fs.createDirectory(directory);
+    return;
+  }
 
+  const directory = dirname(uri.fsPath);
+  await workspace.fs.createDirectory(Uri.file(directory));
   await workspace.fs.writeFile(uri, content);
+
+  return;
 };
 
 export const openFile = async (uri: Uri): Promise<void> => {
