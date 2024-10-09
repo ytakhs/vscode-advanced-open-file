@@ -48,7 +48,6 @@ export const getFileType = async (uri: Uri) => {
   const isFile = ((FileType.SymbolicLink | FileType.File) & stat.type) > 0;
   const isDir = ((FileType.SymbolicLink | FileType.Directory) & stat.type) > 0;
 
-  console.log(isFile, isDir);
   return {
     isFile,
     isDir,
@@ -58,19 +57,19 @@ export const getFileType = async (uri: Uri) => {
 export const createFileWithDir = async (
   uri: Uri,
   content: Uint8Array,
-): Promise<void> => {
+): Promise<Uri> => {
   const onlyDir = uri.fsPath.endsWith(sep);
   if (onlyDir) {
     await workspace.fs.createDirectory(uri);
 
-    return;
+    return uri;
   }
 
   const directory = dirname(uri.fsPath);
   await workspace.fs.createDirectory(Uri.file(directory));
   await workspace.fs.writeFile(uri, content);
 
-  return;
+  return uri;
 };
 
 export const openFile = async (uri: Uri): Promise<void> => {

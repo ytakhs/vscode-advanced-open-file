@@ -30,6 +30,7 @@ export async function buildFileItems(
 ): Promise<ReadonlyArray<FileItem>> {
   let directory = pathname;
   let fragment = "";
+  const fsRoot = getFsRoot();
 
   if (!pathname.endsWith(pathSep)) {
     directory = dirname(pathname);
@@ -37,6 +38,10 @@ export async function buildFileItems(
   }
 
   const uri = Uri.file(directory);
+  if (fsRoot === uri.fsPath && pathname !== uri.fsPath) {
+    return [];
+  }
+
   let files: [string, FileType][];
   if (await isUriExists(uri)) {
     files = await workspace.fs.readDirectory(uri);
@@ -85,7 +90,6 @@ export async function buildFileItems(
     });
   }
 
-  const fsRoot = getFsRoot();
   if (!fragment && directory !== fsRoot && files.length > 0) {
     const parent = dirname(directory);
     filePickItems.unshift(new FileItem(parent, FileType.Directory, ".."));
