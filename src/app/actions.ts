@@ -1,13 +1,14 @@
-import { Uri } from "vscode";
+import type { Uri } from "vscode";
 import { buildFileItems, type FileItem } from "./fileItem";
 import type { State } from "./state";
 import type { Options } from "./options";
 
 export type Actions = {
   showPicker: (uri: Uri, options: Options) => Promise<void>;
+  hidePicker: () => void;
   getSelectedItem: () => FileItem | undefined;
-  getValue: () => Uri;
-  setValue: (uri: Uri) => void;
+  getValue: () => string;
+  setValue: (value: string) => void;
   setItems: (items: ReadonlyArray<FileItem>) => void;
 };
 
@@ -18,9 +19,12 @@ type ActionParams = {
 export const initActions = (state: State): Actions => {
   return {
     showPicker: initShowPicker({ state }),
+    hidePicker: () => state.picker.hide(),
     getSelectedItem: () => state.picker.selectedItems[0],
-    getValue: () => Uri.file(state.picker.value),
-    setValue: initSetValue({ state }),
+    getValue: () => state.picker.value,
+    setValue: (value: string) => {
+      state.picker.value = value;
+    },
     setItems: (items: ReadonlyArray<FileItem>) => {
       state.picker.items = items;
     },
@@ -36,11 +40,5 @@ const initShowPicker = ({ state: { picker } }: ActionParams) => {
       options.groupDirectoriesFirst,
     );
     picker.selectedItems = [];
-  };
-};
-
-const initSetValue = ({ state }: ActionParams) => {
-  return (uri: Uri) => {
-    state.picker.value = uri.fsPath;
   };
 };

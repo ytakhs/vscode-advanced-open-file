@@ -12,7 +12,7 @@ suite("AdvancedOpenFile", () => {
     const app = initApp();
     app.actions.showPicker(testWorkspace, initOptions());
     const v = app.actions.getValue();
-    app.actions.setValue(Uri.joinPath(v, "foo.txt"));
+    app.actions.setValue(Uri.joinPath(Uri.file(v), "foo.txt").fsPath);
     await commands.executeCommand("workbench.action.quickOpenSelectNext");
     await commands.executeCommand(
       "workbench.action.acceptSelectedQuickOpenItem",
@@ -29,7 +29,9 @@ suite("AdvancedOpenFile", () => {
     const app = initApp();
     app.actions.showPicker(testWorkspace, initOptions());
     const v = app.actions.getValue();
-    app.actions.setValue(Uri.joinPath(v, "tmp", "foo", "bar", "foo.txt"));
+    app.actions.setValue(
+      Uri.joinPath(Uri.file(v), "tmp", "foo", "bar", "foo.txt").fsPath,
+    );
 
     await commands.executeCommand(
       "workbench.action.acceptSelectedQuickOpenItem",

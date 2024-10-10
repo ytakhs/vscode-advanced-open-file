@@ -8,6 +8,8 @@ import {
   initOnHideHandler,
 } from "./handlers";
 
+export const INITIAL_VALUE = "" as const;
+
 export type App = {
   disposables: Array<Disposable>;
   actions: Actions;
