@@ -11,9 +11,7 @@
   "engines": {
     "vscode": "^1.79.0"
   },
-  "categories": [
-    "Other"
-  ],
+  "categories": ["Other"],
   "activationEvents": [
     "onCommand:extension.advancedOpenFile",
     "onCommand:extension.advancedOpenWorkspaceFile",
@@ -70,7 +68,7 @@
     "deploy-pre": "vsce publish --yarn --pre-release"
   },
   "lint-staged": {
-    "*.{ts,json}": "prettier --write"
+    "*.{ts,json}": "biome format --write"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.3",

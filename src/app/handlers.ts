@@ -1,5 +1,5 @@
 import { sep } from "node:path";
-import { FileType, Uri, window } from "vscode";
+import { FileType, Uri } from "vscode";
 import { INITIAL_VALUE, type App } from ".";
 import { buildFileItems } from "./fileItem";
 import {
@@ -52,7 +52,6 @@ export const initOnDidAcceptHandler = (app: App) => {
             return openFile(newUri);
           }
 
-          window.showInformationMessage(`created: ${newUri.fsPath}`);
           hidePicker();
 
           return;
