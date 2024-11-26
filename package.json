@@ -71,7 +71,7 @@
     "*.{ts,json}": "biome format --write"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.3",
+    "@biomejs/biome": "1.9.4",
     "@types/node": "20.14.8",
     "@types/vscode": "^1.79.1",
     "@vscode/test-cli": "0.0.10",
